@@ -2,16 +2,31 @@ import gin
 import logging
 import tensorflow as tf
 import tensorflow_datasets as tfds
+import numpy as np
+from sklearn.model_selection import train_test_split
 
 from input_pipeline.preprocessing import preprocess, augment
+
+gin.parse_configure_file(D:\PycharmProjects\dl - lab - 23
+w - team03\diabetic_retinopathy\configs\config.gin)
 
 @gin.configurable
 def load(name, data_dir):
     if name == "idrid":
         logging.info(f"Preparing dataset {name}...")
-        # ...
-
-        return
+        # load the image file
+        train_images = tf.data.Dataset.list_files(os.path.join(data_dir, 'train', '*.jpg'))
+        test_images = tf.data.Dataset.list_files(os.path.join(data_dir, 'test', '*.jpg'))
+        # split the train file to get validation file
+        train_images, val_images = train_test_split(train_images, test_size=103, random_state=7)
+        # make the file to tf.data.Dataset objects
+        ds_train = tf.data.Dataset.from_tensor_slices(train_image_paths).map(lambda x: preprocess(x, label=True),
+                                                                             num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds_val = tf.data.Dataset.from_tensor_slices(val_image_paths).map(lambda x: preprocess(x, label=True),
+                                                                         num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        ds_test = tf.data.Dataset.from_tensor_slices(test_image_paths).map(lambda x: preprocess(x, label=False),
+                                                                           num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        return ds_train, ds_val, ds_test
 
     elif name == "eyepacs":
         logging.info(f"Preparing dataset {name}...")
@@ -23,6 +38,7 @@ def load(name, data_dir):
             data_dir=data_dir
         )
 
+        #数据增强再用
         def _preprocess(img_label_dict):
             return img_label_dict['image'], img_label_dict['label']
 
