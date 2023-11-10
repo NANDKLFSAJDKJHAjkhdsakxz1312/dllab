@@ -1,14 +1,13 @@
 import gin
 import tensorflow as tf
 
-np.set_printoptions(precision=4)
-
-
 @gin.configurable
-def preprocess(image, label, img_height, img_width):
+def preprocess(image, label, img_height=256, img_width=256):
     """Dataset preprocessing: Normalizing and resizing"""
     # Normalize image: `uint8` -> `float32`.
     tf.cast(image, tf.float32) / 255.
+    #Resizing image
+    image = tf.image.resize(image,[img_height, img_width])
 
     return image, label
 

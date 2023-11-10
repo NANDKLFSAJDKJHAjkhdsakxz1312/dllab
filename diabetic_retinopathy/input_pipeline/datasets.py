@@ -1,32 +1,29 @@
 import gin
 import logging
 import tensorflow as tf
+import os
 import tensorflow_datasets as tfds
-import numpy as np
 from sklearn.model_selection import train_test_split
-
-from input_pipeline.preprocessing import preprocess, augment
-
-gin.parse_configure_file(D:\PycharmProjects\dl - lab - 23
-w - team03\diabetic_retinopathy\configs\config.gin)
+from preprocessing import preprocess, augment
 
 @gin.configurable
 def load(name, data_dir):
     if name == "idrid":
         logging.info(f"Preparing dataset {name}...")
         # load the image file
+        ds_train, ds_val, ds_test = load()
         train_images = tf.data.Dataset.list_files(os.path.join(data_dir, 'train', '*.jpg'))
         test_images = tf.data.Dataset.list_files(os.path.join(data_dir, 'test', '*.jpg'))
         # split the train file to get validation file
         train_images, val_images = train_test_split(train_images, test_size=103, random_state=7)
         # make the file to tf.data.Dataset objects
-        ds_train = tf.data.Dataset.from_tensor_slices(train_image_paths).map(lambda x: preprocess(x, label=True),
+        ds_train = tf.data.Dataset.from_tensor_slices(train_images).map(lambda x: preprocess(x, label=True),
                                                                              num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds_val = tf.data.Dataset.from_tensor_slices(val_image_paths).map(lambda x: preprocess(x, label=True),
+        ds_val = tf.data.Dataset.from_tensor_slices(val_images).map(lambda x: preprocess(x, label=True),
                                                                          num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds_test = tf.data.Dataset.from_tensor_slices(test_image_paths).map(lambda x: preprocess(x, label=False),
+        ds_test = tf.data.Dataset.from_tensor_slices(test_images).map(lambda x: preprocess(x, label=False),
                                                                            num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        return ds_train, ds_val, ds_test
+        return ds_train, ds_val, ds_test, ds_info
 
     elif name == "eyepacs":
         logging.info(f"Preparing dataset {name}...")
@@ -38,13 +35,12 @@ def load(name, data_dir):
             data_dir=data_dir
         )
 
-        #数据增强再用
-        def _preprocess(img_label_dict):
-            return img_label_dict['image'], img_label_dict['label']
+        #def _preprocess(img_label_dict):
+            #return img_label_dict['image'], img_label_dict['label']
 
-        ds_train = ds_train.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds_val = ds_val.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        ds_test = ds_test.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        #ds_train = ds_train.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        #ds_val = ds_val.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+        #ds_test = ds_test.map(_preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
         return prepare(ds_train, ds_val, ds_test, ds_info)
 
