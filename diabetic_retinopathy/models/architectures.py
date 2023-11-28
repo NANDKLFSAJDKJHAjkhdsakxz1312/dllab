@@ -1,7 +1,6 @@
 import gin
 import tensorflow as tf
-
-from models.layers import vgg_block
+from diabetic_retinopathy.models.layers import vgg_block
 
 @gin.configurable
 def vgg_like(input_shape, n_classes, base_filters, n_blocks, dense_units, dropout_rate):

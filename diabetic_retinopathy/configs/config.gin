@@ -8,13 +8,13 @@ vgg_like.dropout_rate = 0.2
 vgg_block.kernel_size = (3, 3)
 
 # Training
-Trainer.total_steps = 1e5
-Trainer.log_interval = 1e4
-Trainer.ckpt_interval = 1e4
+train.Trainer.total_steps = 1e5
+train.Trainer.log_interval = 1e4
+train.Trainer.ckpt_interval = 1e4
 
 # Input pipeline
 load.name = 'idrid'
-load.data_dir = 'D:\PycharmProjects\idrid\IDRID_dataset'
+load.data_dir = 'D:\idrid\IDRID_dataset'
 preprocess.img_height = 256
 preprocess.img_width = 256
 prepare.batch_size = 32
