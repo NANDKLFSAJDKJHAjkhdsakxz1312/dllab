@@ -9,7 +9,7 @@ from models.architectures import vgg_like
 
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean("train", True, "Specify whether to train or evaluate a model.")
+flags.DEFINE_boolean("train", False, "Specify whether to train or evaluate a model.")
 
 
 def main(argv):
@@ -25,15 +25,19 @@ def main(argv):
 
     # setup pipeline
     ds_train, ds_val, ds_test = datasets.load()
+    print("Datasets loaded.")
 
     # model
     model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
+    print("Model initialized.")
 
     if FLAGS.train:
+        print("Starting training...")
         trainer = Trainer(model, ds_train, ds_val, run_paths)
         for _ in trainer.train():
             continue
     else:
+        print("Starting evaluation...")
         evaluate(model, ds_test, run_paths)
 
 

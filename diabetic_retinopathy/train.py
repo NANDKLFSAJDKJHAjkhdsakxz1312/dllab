@@ -25,6 +25,12 @@ class Trainer(object):
 
         self.model = model
         self.optimizer = tf.keras.optimizers.Adam()
+        self.ds_train = ds_train
+        self.ds_val = ds_val
+        self.run_paths = run_paths
+        self.total_steps = total_steps
+        self.log_interval = log_interval
+        self.ckpt_interval = ckpt_interval
 
         # Checkpoint Manager
         self.ckpt = tf.train.Checkpoint(
@@ -38,7 +44,6 @@ class Trainer(object):
         self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(
             from_logits=True
         )
-        self.optimizer = tf.keras.optimizers.Adam()
 
         # Metrics
         self.train_loss = tf.keras.metrics.Mean(name="train_loss")
@@ -50,13 +55,6 @@ class Trainer(object):
         self.val_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(
             name="val_accuracy"
         )
-
-        self.ds_train = ds_train
-        self.ds_val = ds_val
-        self.run_paths = run_paths
-        self.total_steps = total_steps
-        self.log_interval = log_interval
-        self.ckpt_interval = ckpt_interval
 
     @tf.function
     def train_step(self, images, labels):
@@ -91,6 +89,7 @@ class Trainer(object):
             print("Initializing from scratch.")
 
         for idx, (images, labels) in enumerate(self.ds_train):
+            print(f"Training step {idx+1}")
             step = idx + 1
             self.train_step(images, labels)
 
@@ -101,6 +100,15 @@ class Trainer(object):
 
                 for val_images, val_labels in self.ds_val:
                     self.val_step(val_images, val_labels)
+
+                info = (
+                    f"Step {step}, "
+                    f"Loss: {self.train_loss.result():.4f}, "
+                    f"Accuracy: {self.train_accuracy.result() * 100:.2f}%, "
+                    f"Validation Loss: {self.val_loss.result():.4f}, "
+                    f"Validation Accuracy: {self.val_accuracy.result() * 100:.2f}%"
+                )
+                print(info)
 
                 template = "Step {}, Loss: {}, Accuracy: {}, Validation Loss: {}, Validation Accuracy: {}"
                 logging.info(

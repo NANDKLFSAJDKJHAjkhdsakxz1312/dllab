@@ -24,12 +24,13 @@ def evaluate(model, ds_test, run_paths):
         test_accuracy(labels, predictions)
 
         # Iterate over the test dataset
-        for test_images, test_labels in ds_test:
-            test_step(test_images, test_labels)
+
+    for test_images, test_labels in ds_test:
+        test_step(test_images, test_labels)
 
         # Log and return the test metrics
-        print(
-            f"Test Loss: {test_loss.result()}, Test Accuracy: {test_accuracy.result() * 100}"
-        )
+    print(
+        f"Test Loss: {test_loss.result()}, Test Accuracy: {test_accuracy.result() * 100}"
+    )
 
     return
