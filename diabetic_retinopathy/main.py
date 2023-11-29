@@ -9,7 +9,7 @@ from models.architectures import vgg_like
 
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean("train", False, "Specify whether to train or evaluate a model.")
+flags.DEFINE_boolean("train", True, "Specify whether to train or evaluate a model.")
 
 
 def main(argv):

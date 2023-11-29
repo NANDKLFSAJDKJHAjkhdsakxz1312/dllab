@@ -64,6 +64,7 @@ class Trainer(object):
             predictions = self.model(images, training=True)
             loss = self.loss_object(labels, predictions)
         gradients = tape.gradient(loss, self.model.trainable_variables)
+
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
 
         self.train_loss(loss)

@@ -20,4 +20,3 @@ preprocess.img_width = 256
 prepare.batch_size = 32
 prepare.caching = False
 prepare.n_epochs = 5
-
