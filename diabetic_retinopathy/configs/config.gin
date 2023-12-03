@@ -8,9 +8,9 @@ vgg_like.dropout_rate = 0.2
 vgg_block.kernel_size = (3, 3)
 
 # Training
-train.Trainer.total_steps = 65
-train.Trainer.log_interval = 10
-train.Trainer.ckpt_interval = 10
+train.Trainer.total_steps =1000
+train.Trainer.log_interval = 100
+train.Trainer.ckpt_interval = 100
 
 # Input pipeline
 load.name = 'idrid'
@@ -18,5 +18,5 @@ load.data_dir = 'D:\PycharmProjects\dl-lab-23w-team03\diabetic_retinopathy'
 preprocess.img_height = 256
 preprocess.img_width = 256
 prepare.batch_size = 32
-prepare.caching = False
-prepare.n_epochs = 5
+prepare.caching = True
+prepare.n_epochs = 50

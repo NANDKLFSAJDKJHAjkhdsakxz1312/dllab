@@ -3,6 +3,24 @@ import logging
 import tensorflow as tf
 import os
 from diabetic_retinopathy.input_pipeline.preprocessing import preprocess, augment
+import matplotlib.pyplot as plt
+
+#Show class distribution
+def plot_class_distribution(class_counts, title='Class Distribution'):
+    labels, counts = zip(*class_counts.items())
+    plt.bar(labels, counts)
+    plt.xlabel('Classes')
+    plt.ylabel('Number of Samples')
+    plt.title(title)
+    plt.show()
+
+#Count the number of samples per class
+def count_classes(ds):
+    class_counts = {}
+    for _, label in ds.as_numpy_iterator():
+        label = label
+        class_counts[label] = class_counts.get(label, 0) + 1
+    return class_counts
 
 
 @gin.configurable
@@ -41,14 +59,33 @@ def load(name, data_dir):
 
 @gin.configurable
 def prepare(ds_train, ds_val, ds_test, batch_size, caching, n_epochs):
+    #Visualize the original distribution
+    class_counts_before = count_classes(ds_train)
+    plot_class_distribution(class_counts_before, 'Original Class Distribution')
+
+    # Resampling
+    def class_func(image, label):
+        return label
+
+    ds_train_resampled = ds_train.rejection_resample(
+        class_func=class_func, target_dist=[0.5, 0.5]
+    )
+
+    # Map function to remove class information
+    ds_train_resampled = ds_train_resampled.map(lambda extra_label, features_and_label: features_and_label)
+
+    # Visualize the distribution after resampling
+    class_counts_after = count_classes(ds_train_resampled)
+    plot_class_distribution(class_counts_after, 'Resampled Class Distribution')
+
     # Prepare training dataset
-    ds_train = ds_train.map(
+    ds_train = ds_train_resampled.map(
         preprocess, num_parallel_calls=tf.data.experimental.AUTOTUNE
     )
     if caching:
         ds_train = ds_train.cache()
     ds_train = ds_train.map(augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    ds_train = ds_train.shuffle(310 // 10)
+    ds_train = ds_train.shuffle(320 // 10)
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(n_epochs)
     ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)

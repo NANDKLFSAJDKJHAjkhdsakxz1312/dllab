@@ -58,7 +58,7 @@ def prepare_image_paths_and_labels(data_dir):
     train_image_paths, train_labels = shuffle(train_image_paths, train_labels)
 
     # Split train dataset to 6:2:2
-    split_idx = int(len(train_image_paths) * 0.75)
+    split_idx = 310
     train_image_paths, val_image_paths = (
         train_image_paths[:split_idx],
         train_image_paths[split_idx:],
