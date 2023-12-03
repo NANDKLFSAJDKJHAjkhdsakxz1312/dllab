@@ -6,6 +6,8 @@ from evaluation.eval import evaluate
 from diabetic_retinopathy.input_pipeline import datasets
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like
+from diabetic_retinopathy.input_pipeline.createTFRecord import create_tfrecord
+from diabetic_retinopathy.input_pipeline.createTFRecord import prepare_image_paths_and_labels
 
 
 FLAGS = flags.FLAGS
@@ -22,6 +24,22 @@ def main(argv):
     # gin-config
     gin.parse_config_files_and_bindings(["configs/config.gin"], [])
     utils_params.save_config(run_paths["path_gin"], gin.config_str())
+
+    # Prepare images and labels
+    (
+        train_image_paths,
+        train_labels,
+        val_image_paths,
+        val_labels,
+        test_image_paths,
+        test_labels,
+    ) = prepare_image_paths_and_labels()
+
+    # Create TF files
+    create_tfrecord(train_image_paths, train_labels, "train.tfrecord")
+    create_tfrecord(val_image_paths, val_labels, "val.tfrecord")
+    create_tfrecord(test_image_paths, test_labels, "test.tfrecord")
+    print("TfRecord files created.")
 
     # setup pipeline
     ds_train, ds_val, ds_test = datasets.load()

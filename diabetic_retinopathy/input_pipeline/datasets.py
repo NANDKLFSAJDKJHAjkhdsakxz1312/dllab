@@ -42,13 +42,13 @@ def load(name, data_dir):
 
         # Define dataset object
         ds_train = tf.data.TFRecordDataset(
-            filenames=[os.path.join(data_dir, "input_pipeline", "train.tfrecord")]
+            filenames=[os.path.join(data_dir, "train.tfrecord")]
         ).map(_parse_function)
         ds_val = tf.data.TFRecordDataset(
-            filenames=[os.path.join(data_dir, "input_pipeline", "val.tfrecord")]
+            filenames=[os.path.join(data_dir, "val.tfrecord")]
         ).map(_parse_function)
         ds_test = tf.data.TFRecordDataset(
-            filenames=[os.path.join(data_dir, "input_pipeline", "test.tfrecord")]
+            filenames=[os.path.join(data_dir, "test.tfrecord")]
         ).map(_parse_function)
 
         return prepare(ds_train, ds_val, ds_test)
@@ -58,7 +58,7 @@ def load(name, data_dir):
 
 
 @gin.configurable
-def prepare(ds_train, ds_val, ds_test, batch_size, caching, n_epochs):
+def prepare(ds_train, ds_val, ds_test, batch_size, caching):
     #Visualize the original distribution
     class_counts_before = count_classes(ds_train)
     plot_class_distribution(class_counts_before, 'Original Class Distribution')
@@ -87,7 +87,7 @@ def prepare(ds_train, ds_val, ds_test, batch_size, caching, n_epochs):
     ds_train = ds_train.map(augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
     ds_train = ds_train.shuffle(320 // 10)
     ds_train = ds_train.batch(batch_size)
-    ds_train = ds_train.repeat(n_epochs)
+    ds_train = ds_train.repeat(-1)
     ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)
 
     # Prepare validation dataset

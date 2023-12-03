@@ -33,7 +33,6 @@ def create_tfrecord(image_paths, labels, filename):
             example = tf.train.Example(features=tf.train.Features(feature=feature))
             writer.write(example.SerializeToString())
 
-
 @gin.configurable
 def prepare_image_paths_and_labels(data_dir):
     train_labels_df = pd.read_csv(os.path.join(data_dir, "labels", "train.csv"))
@@ -73,20 +72,3 @@ def prepare_image_paths_and_labels(data_dir):
         test_image_paths,
         test_labels,
     )
-
-
-# Prepare images and labels
-data_dir = "D:\idrid\IDRID_dataset"
-(
-    train_image_paths,
-    train_labels,
-    val_image_paths,
-    val_labels,
-    test_image_paths,
-    test_labels,
-) = prepare_image_paths_and_labels(data_dir)
-
-# Create TF files
-create_tfrecord(train_image_paths, train_labels, "train.tfrecord")
-create_tfrecord(val_image_paths, val_labels, "val.tfrecord")
-create_tfrecord(test_image_paths, test_labels, "test.tfrecord")
