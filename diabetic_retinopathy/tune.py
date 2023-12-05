@@ -4,7 +4,7 @@ import gin
 import ray
 from ray import tune
 
-from input_pipeline.datasets import load
+from diabetic_retinopathy.input_pipeline.datasets import load
 from models.architectures import vgg_like
 from train import Trainer
 from utils import utils_params, utils_misc

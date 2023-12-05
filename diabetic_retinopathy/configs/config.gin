@@ -8,14 +8,15 @@ vgg_like.dropout_rate = 0.2
 vgg_block.kernel_size = (3, 3)
 
 # Training
-Trainer.total_steps = 1e5
-Trainer.log_interval = 1e4
-Trainer.ckpt_interval = 1e4
+train.Trainer.total_steps =1e4
+train.Trainer.log_interval = 100
+train.Trainer.ckpt_interval = 100
 
 # Input pipeline
-load.name = 'mnist'
-load.data_dir = '/home/data/tensorflow_datasets'
-preprocess.img_height = 28
-preprocess.img_width = 28
+load.name = 'idrid'
+load.data_dir = 'D:\PycharmProjects\dl-lab-23w-team03\diabetic_retinopathy'
+preprocess.img_height = 256
+preprocess.img_width = 256
 prepare.batch_size = 32
-prepare.caching = False
+prepare.caching = True
+prepare_image_paths_and_labels.data_dir = 'D:/idrid/IDRID_dataset'
