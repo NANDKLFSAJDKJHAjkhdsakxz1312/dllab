@@ -1,5 +1,5 @@
 import tensorflow as tf
-from diabetic_retinopathy.evaluation.metrics import ConfusionMatrix
+from .metrics import ConfusionMatrix
 
 
 def evaluate(model, ds_test, run_paths, num_classes, label):

@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
-from prettytable import PrettyTable
 import matplotlib.pyplot as plt
+import pandas as pd
 
 class ConfusionMatrix(tf.keras.metrics.Metric):
     def __init__(self, num_classes, labels, name="confusion_matrix", **kwargs):
@@ -36,8 +36,7 @@ class ConfusionMatrix(tf.keras.metrics.Metric):
     def summary(self):
         # Calculate precision, sensitivity, specificity
         cm = self.confusion_matrix.numpy()
-        table = PrettyTable()
-        table.field_names = ["", "Precision", "Recall", "Specificity"]
+        data = []
 
         for i in range(self.num_classes):
             TP = cm[i, i]
@@ -47,9 +46,10 @@ class ConfusionMatrix(tf.keras.metrics.Metric):
             Precision = round(TP / (TP + FP), 3) if TP + FP != 0 else 0.0
             Sensitivity = round(TP / (TP + FN), 3) if TP + FN != 0 else 0.0
             Specificity = round(TN / (TN + FP), 3) if TN + FP != 0 else 0.0
-            table.add_row([self.labels[i], Precision, Sensitivity, Specificity])
+            data.append([self.labels[i], Precision, Sensitivity, Specificity])
 
-        print(table)
+        df = pd.DataFrame(data, columns=["Label", "Precision", "Recall", "Specificity"])
+        print(df)
 
     def plot(self):
         cm = self.confusion_matrix.numpy()
