@@ -8,6 +8,7 @@ from diabetic_retinopathy.input_pipeline.datasets import load
 from models.architectures import vgg_like
 from train import Trainer
 from utils import utils_params, utils_misc
+from diabetic_retinopathy.evaluation.metrics import ConfusionMatrix
 
 
 def train_func(config):
@@ -30,7 +31,10 @@ def train_func(config):
     ds_train, ds_val, ds_test, ds_info = load()
 
     # model
-    model = vgg_like(input_shape=ds_info.features["image"].shape, n_classes=ds_info.features["label"].num_classes)
+    model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
+
+    # Create confusion matrix object
+    confusion_matrix_metric = ConfusionMatrix(num_classes=2, labels=["label1", "label2"])
 
     trainer = Trainer(model, ds_train, ds_val, ds_info, run_paths)
     for val_accuracy in trainer.train():
@@ -48,7 +52,7 @@ analysis = tune.run(
         "vgg_like.dropout_rate": tune.uniform(0, 0.9),
     })
 
-print("Best config: ", analysis.get_best_config(metric="val_accuracy", mode="max"))
+print("Best config: ", analysis.get_best_config(metric="precision", mode="max"))
 
 # Get a dataframe for analyzing trial results.
 df = analysis.dataframe()

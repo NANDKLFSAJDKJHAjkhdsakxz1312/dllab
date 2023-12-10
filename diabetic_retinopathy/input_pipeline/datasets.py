@@ -85,7 +85,7 @@ def prepare(ds_train, ds_val, ds_test, batch_size, caching):
     if caching:
         ds_train = ds_train.cache()
     ds_train = ds_train.map(augment, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    ds_train = ds_train.shuffle(320 // 10)
+    ds_train = ds_train.shuffle(1000)
     ds_train = ds_train.batch(batch_size)
     ds_train = ds_train.repeat(-1)
     ds_train = ds_train.prefetch(tf.data.experimental.AUTOTUNE)

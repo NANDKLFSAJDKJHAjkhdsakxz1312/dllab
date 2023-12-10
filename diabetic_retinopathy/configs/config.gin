@@ -8,7 +8,7 @@ vgg_like.dropout_rate = 0.2
 vgg_block.kernel_size = (3, 3)
 
 # Training
-train.Trainer.total_steps =1e4
+train.Trainer.total_steps =1000
 train.Trainer.log_interval = 100
 train.Trainer.ckpt_interval = 100
 
@@ -19,4 +19,4 @@ preprocess.img_height = 256
 preprocess.img_width = 256
 prepare.batch_size = 32
 prepare.caching = True
-prepare_image_paths_and_labels.data_dir = 'D:/idrid/IDRID_dataset'
+prepare_image_paths_and_labels.data_dir = 'D:\idrid\IDRID_dataset'

@@ -33,6 +33,8 @@ def main(argv):
         val_labels,
         test_image_paths,
         test_labels,
+        num_classes,
+        label
     ) = prepare_image_paths_and_labels()
 
     # Create TF files
@@ -56,7 +58,7 @@ def main(argv):
             continue
     else:
         print("Starting evaluation...")
-        evaluate(model, ds_test, run_paths)
+        evaluate(model, ds_test, run_paths, num_classes, label)
 
 
 if __name__ == "__main__":
