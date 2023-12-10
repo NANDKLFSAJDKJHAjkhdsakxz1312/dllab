@@ -23,6 +23,10 @@ def _int64_feature(value):
 
 
 def create_tfrecord(image_paths, labels, filename):
+    #Check TfRecord File
+    if os.path.exists(filename):
+        print(f"TFRecord file {filename} already exists. Skipping creation.")
+        return
     with tf.io.TFRecordWriter(filename) as writer:
         for img_path, label in zip(image_paths, labels):
             image = tf.io.read_file(img_path)
@@ -53,6 +57,11 @@ def prepare_image_paths_and_labels(data_dir):
     train_labels = train_labels_df["Retinopathy grade"].apply(binary_label).tolist()
     test_labels = test_labels_df["Retinopathy grade"].apply(binary_label).tolist()
 
+    #Extract information of class and label
+    unique_labels = sorted(set(train_labels + test_labels))
+    num_classes = len(unique_labels)
+    labels = [str(label) for label in unique_labels]
+
     # Shuffle train images
     train_image_paths, train_labels = shuffle(train_image_paths, train_labels)
 
@@ -71,4 +80,6 @@ def prepare_image_paths_and_labels(data_dir):
         val_labels,
         test_image_paths,
         test_labels,
+        num_classes,
+        labels
     )

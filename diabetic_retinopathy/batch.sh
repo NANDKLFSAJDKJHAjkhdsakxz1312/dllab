@@ -7,6 +7,6 @@
 #SBATCH --gpus=1
 
 # Activate everything you need
-module load cuda/11.2
+module load cuda/11.8
 # Run your python code
 python3 main.py

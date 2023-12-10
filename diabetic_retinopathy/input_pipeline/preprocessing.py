@@ -10,7 +10,7 @@ def preprocess(image, label, img_height=256, img_width=256):
     image = tf.cast(image, tf.float32) / 255.0
 
     # Resizing image
-    image = tf.image.resize(image, [img_height, img_width])
+    image = tf.image.resize_with_pad(image, img_height, img_width)
 
     return image, label
 

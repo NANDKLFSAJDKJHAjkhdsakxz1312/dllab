@@ -1,8 +1,8 @@
 import tensorflow as tf
-from diabetic_retinopathy.train import Trainer
+from diabetic_retinopathy.evaluation.metrics import ConfusionMatrix
 
 
-def evaluate(model, ds_test, run_paths):
+def evaluate(model, ds_test, run_paths, num_classes, label):
     # Load Checkpoints
     checkpoint_path = run_paths["path_ckpts_train"]
     latest_ckpt = tf.train.latest_checkpoint(checkpoint_path)
@@ -12,6 +12,7 @@ def evaluate(model, ds_test, run_paths):
 
     test_loss = tf.keras.metrics.Mean(name="test_loss")
     test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name="test_accuracy")
+    test_confusion_matrix = ConfusionMatrix(num_classes, label)
 
     # Evaluation step
     @tf.function
@@ -22,6 +23,8 @@ def evaluate(model, ds_test, run_paths):
         )
         test_loss(t_loss)
         test_accuracy(labels, predictions)
+        test_confusion_matrix.update_state(labels, tf.argmax(predictions, axis=1))
+
 
         # Iterate over the test dataset
 
@@ -33,4 +36,7 @@ def evaluate(model, ds_test, run_paths):
         f"Test Loss: {test_loss.result()}, Test Accuracy: {test_accuracy.result() * 100}"
     )
 
-    return
+    test_confusion_matrix.summary()
+    test_confusion_matrix.plot()
+
+    return test_loss.result(), test_accuracy.result()
