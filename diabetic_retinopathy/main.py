@@ -3,11 +3,11 @@ import logging
 from absl import app, flags
 from train import Trainer
 from evaluation.eval import evaluate
-from diabetic_retinopathy.input_pipeline import datasets
+from input_pipeline import datasets
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like
-from diabetic_retinopathy.input_pipeline.createTFRecord import create_tfrecord
-from diabetic_retinopathy.input_pipeline.createTFRecord import prepare_image_paths_and_labels
+from input_pipeline.createTFRecord import create_tfrecord
+from input_pipeline.createTFRecord import prepare_image_paths_and_labels
 
 
 FLAGS = flags.FLAGS
