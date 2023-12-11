@@ -20,6 +20,7 @@ class Trainer(object):
         script_dir = os.path.dirname(os.path.abspath(__file__))
         log_dir = os.path.join(script_dir, "logs")
         ckpt_dir = os.path.join(script_dir, "checkpoints")
+        print("Checkpoint directory:", ckpt_dir)
         self.run_paths = {"path_logs": log_dir, "path_ckpts_train": ckpt_dir}
         self.summary_writer = tf.summary.create_file_writer(self.run_paths["path_logs"])
 
@@ -27,7 +28,6 @@ class Trainer(object):
         self.optimizer = tf.keras.optimizers.Adam()
         self.ds_train = ds_train
         self.ds_val = ds_val
-        self.run_paths = run_paths
         self.total_steps = total_steps
         self.log_interval = log_interval
         self.ckpt_interval = ckpt_interval
