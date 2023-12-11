@@ -2,7 +2,7 @@ import gin
 import logging
 import tensorflow as tf
 import os
-from diabetic_retinopathy.input_pipeline.preprocessing import preprocess, augment
+from .preprocessing import preprocess, augment
 import matplotlib.pyplot as plt
 
 #Show class distribution

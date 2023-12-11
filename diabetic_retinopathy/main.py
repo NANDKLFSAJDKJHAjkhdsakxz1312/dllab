@@ -11,7 +11,7 @@ from input_pipeline.createTFRecord import prepare_image_paths_and_labels
 
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean("train", True, "Specify whether to train or evaluate a model.")
+flags.DEFINE_boolean("train", False, "Specify whether to train or evaluate a model.")
 
 
 def main(argv):

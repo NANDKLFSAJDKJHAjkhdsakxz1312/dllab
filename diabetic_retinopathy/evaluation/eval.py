@@ -1,10 +1,12 @@
 import tensorflow as tf
 from .metrics import ConfusionMatrix
+import os
 
 
 def evaluate(model, ds_test, run_paths, num_classes, label):
     # Load Checkpoints
-    checkpoint_path = run_paths["path_ckpts_train"]
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    checkpoint_path = os.path.join(script_dir, "checkpoints")
     latest_ckpt = tf.train.latest_checkpoint(checkpoint_path)
     if latest_ckpt:
         ckpt = tf.train.Checkpoint(model=model)
