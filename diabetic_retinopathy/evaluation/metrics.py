@@ -44,11 +44,12 @@ class ConfusionMatrix(tf.keras.metrics.Metric):
             FN = np.sum(cm[:, i]) - TP
             TN = np.sum(cm) - TP - FP - FN
             Precision = round(TP / (TP + FP), 3) if TP + FP != 0 else 0.0
-            Sensitivity = round(TP / (TP + FN), 3) if TP + FN != 0 else 0.0
+            Recall = round(TP / (TP + FN), 3) if TP + FN != 0 else 0.0
+            F1 = round(2 * (Precision * Recall) / (Precision + Recall), 3) if TP + FN != 0 else 0.0
             Specificity = round(TN / (TN + FP), 3) if TN + FP != 0 else 0.0
-            data.append([self.labels[i], Precision, Sensitivity, Specificity])
+            data.append([self.labels[i], Precision, Recall, Specificity,F1])
 
-        df = pd.DataFrame(data, columns=["Label", "Precision", "Recall", "Specificity"])
+        df = pd.DataFrame(data, columns=["Label", "Precision", "Recall", "Specificity", "F1_Score"])
         print(df)
 
     def plot(self):

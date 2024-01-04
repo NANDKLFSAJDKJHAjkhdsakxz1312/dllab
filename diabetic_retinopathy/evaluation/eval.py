@@ -3,14 +3,30 @@ from .metrics import ConfusionMatrix
 import os
 
 
-def evaluate(model, ds_test, run_paths, num_classes, label):
-    # Load Checkpoints
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    checkpoint_path = os.path.join(script_dir, "checkpoints")
-    latest_ckpt = tf.train.latest_checkpoint(checkpoint_path)
-    if latest_ckpt:
-        ckpt = tf.train.Checkpoint(model=model)
-        ckpt.restore(latest_ckpt).expect_partial()
+def count_classes(ds):
+    class_counts = {}
+    for images, labels in ds:
+        for label in labels.numpy():
+            class_counts[label] = class_counts.get(label, 0) + 1
+    return class_counts
+
+def evaluate(model, ds_test, checkpoint_paths, num_classes, label):
+    # # Load Checkpoints
+    # optimizer = tf.keras.optimizers.Adam(learning_rate=0.0000001)
+    # ckpt = tf.train.Checkpoint(model=model, optimizer=optimizer)
+    # latest_ckpt = tf.train.latest_checkpoint(checkpoint_paths)
+    # if latest_ckpt:
+    #     ckpt.restore(ckpt).expect_partial()
+    #     print(f"Restored from {latest_ckpt}")
+    # model.compile(
+    #     optimizer=optimizer,
+    #     loss="binary_crossentropy" if num_classes == 2 else "categorical_crossentropy",
+    #     metrics=["accuracy"]
+    # )
+
+    # Load Models
+    saved_model_path = os.path.join(checkpoint_paths, "saved_model")
+    model = tf.keras.models.load_model(saved_model_path)
 
     test_loss = tf.keras.metrics.Mean(name="test_loss")
     test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name="test_accuracy")
@@ -27,11 +43,14 @@ def evaluate(model, ds_test, run_paths, num_classes, label):
         test_accuracy(labels, predictions)
         test_confusion_matrix.update_state(labels, tf.argmax(predictions, axis=1))
 
-
-        # Iterate over the test dataset
-
+    # Iterate over the test dataset
     for test_images, test_labels in ds_test:
         test_step(test_images, test_labels)
+
+    class_counts = count_classes(ds_test)
+    print("Class Distribution in Test Dataset:")
+    for class_label, count in class_counts.items():
+        print(f"Class {class_label}: {count} samples")
 
     # Log and return the test metrics
     print(

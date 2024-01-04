@@ -17,18 +17,22 @@ def preprocess(image, label, img_height=256, img_width=256):
 
 def augment(image, label):
     """Data augmentation"""
+    choice = tf.random.uniform(shape=[],minval=0,maxval=4,dtype=tf.int32)
+    # Random contrast adjustment
     #Randomly rotate the image
-    image = tf.image.rot90(
-        image, k=tf.random.uniform(shape=[], minval=0, maxval=4, dtype=tf.int32)
-    )
+    if choice == 0:
+        image = tf.image.rot90(image, k=tf.random.uniform(shape=[], minval=0, maxval=4, dtype=tf.int32))
 
     # Randomly flip the image horizontally (left to right).
-    image = tf.image.random_flip_left_right(image)
+    if choice == 1:
+        image = tf.image.random_flip_left_right(image)
 
     # Random brightness adjustment
-    image = tf.image.random_brightness(image, max_delta=0.3)
+    if choice == 2:
+        image = tf.image.random_brightness(image, max_delta=0.3)
 
     # Random contrast adjustment
-    image = tf.image.random_contrast(image, lower=0.8, upper=1.2)
+    if choice == 3:
+        image = tf.image.random_contrast(image, lower=0.8, upper=1.2)
 
     return image, label

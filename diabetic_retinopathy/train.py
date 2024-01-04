@@ -2,6 +2,7 @@ import gin
 import tensorflow as tf
 import logging
 import os
+import wandb
 
 
 @gin.configurable
@@ -17,15 +18,11 @@ class Trainer(object):
         ckpt_interval,
     ):
         # Summary Writer
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        log_dir = os.path.join(script_dir, "logs")
-        ckpt_dir = os.path.join(script_dir, "checkpoints")
-        print("Checkpoint directory:", ckpt_dir)
-        self.run_paths = {"path_logs": log_dir, "path_ckpts_train": ckpt_dir}
-        self.summary_writer = tf.summary.create_file_writer(self.run_paths["path_logs"])
+        self.run_paths = run_paths
+        self.summary_writer = tf.summary.create_file_writer(self.run_paths["path_logs_train"])
 
         self.model = model
-        self.optimizer = tf.keras.optimizers.Adam()
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=1e-5)
         self.ds_train = ds_train
         self.ds_val = ds_val
         self.total_steps = total_steps
@@ -122,6 +119,11 @@ class Trainer(object):
                     )
                 )
 
+                # wandb logging
+                wandb.log({'train_acc': self.train_accuracy.result() * 100, 'train_loss': self.train_loss.result(),
+                           'val_acc': self.val_accuracy.result() * 100, 'val_loss': self.val_loss.result(),
+                           'step': step})
+
                 # Write summary to tensorboard
                 with self.summary_writer.as_default():
                     tf.summary.scalar("Loss", self.train_loss.result(), step=step)
@@ -154,3 +156,9 @@ class Trainer(object):
                 self.ckpt_manager.save()
 
                 return self.val_accuracy.result().numpy()
+    def save_model(self):
+        save_path = os.path.join(self.run_paths["path_ckpts_train"], "saved_model")
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        self.model.save(save_path)
+        print(f"Model saved to {save_path}")
