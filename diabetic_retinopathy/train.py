@@ -22,7 +22,7 @@ class Trainer(object):
         self.summary_writer = tf.summary.create_file_writer(self.run_paths["path_logs_train"])
 
         self.model = model
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=1e-5)
+        self.optimizer = tf.keras.optimizers.Adam()
         self.ds_train = ds_train
         self.ds_val = ds_val
         self.total_steps = total_steps

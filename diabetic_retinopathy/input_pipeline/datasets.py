@@ -28,7 +28,7 @@ def load(name, data_dir):
     if name == "idrid":
         logging.info(f"Preparing dataset {name}...")
 
-        # Parse TFRecord function
+        # parse TFRecord
         def _parse_function(proto):
             keys_to_features = {
                 "image": tf.io.FixedLenFeature([], tf.string),
