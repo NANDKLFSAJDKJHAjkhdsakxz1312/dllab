@@ -1,0 +1,17 @@
+# Architectures
+
+
+# Layers
+
+
+# Training
+
+
+# Input pipeline
+load.name = 'HAPT'
+load.window_size = 250
+load.window_shift = 125
+load.batch_size = 32
+load.buffer_size = 512
+
+
