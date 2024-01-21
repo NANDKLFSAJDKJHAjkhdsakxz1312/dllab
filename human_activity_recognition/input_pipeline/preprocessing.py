@@ -66,6 +66,33 @@ def save_combined_data(output_dir, dataset_type):
     combined_features.to_csv(os.path.join(output_dir, f'{dataset_type}_features.csv'), index=False)
     np.save(os.path.join(output_dir, f'{dataset_type}_labels.npy'), combined_labels)
 
+def plot_sensor_data(data_file, title, output_dir):
+    data = pd.read_csv(data_file)
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(15, 10))
+
+    ax1.plot(data['acc_x'], label='acc_x')
+    ax1.plot(data['acc_y'], label='acc_y')
+    ax1.plot(data['acc_z'], label='acc_z')
+    ax1.set_title('Accelerometer Data of ' + title)
+    ax1.set_xlabel('Time')
+    ax1.set_ylabel('Accelerometer Value')
+    ax1.legend()
+
+    ax2.plot(data['gyro_x'], label='gyro_x')
+    ax2.plot(data['gyro_y'], label='gyro_y')
+    ax2.plot(data['gyro_z'], label='gyro_z')
+    ax2.set_title('Gyroscope Data of ' + title)
+    ax2.set_xlabel('Time')
+    ax2.set_ylabel('Gyroscope Value')
+    ax2.legend()
+
+    plt.tight_layout()
+
+    output_file_path = os.path.join(output_dir, title.replace(' ', '_') + '.png')
+    plt.savefig(output_file_path)
+    print(f"Image saved to {output_file_path}")
+    plt.show()
+
 if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.realpath(__file__))
     data_dir = 'D:/HAPT/RawData'
@@ -85,9 +112,9 @@ if __name__ == "__main__":
     save_combined_data(output_dir, 'test')
     save_combined_data(output_dir, 'validation')
 
-    plot_sensor_data(os.path.join(output_dir, 'train_features.csv'), 'train')
-    plot_sensor_data(os.path.join(output_dir, 'test_features.csv'), 'test')
-    plot_sensor_data(os.path.join(output_dir, 'validation_features.csv'), 'validation')
+    plot_sensor_data(os.path.join(output_dir, 'train_features.csv'), 'train', output_dir)
+    plot_sensor_data(os.path.join(output_dir, 'test_features.csv'), 'test', output_dir)
+    plot_sensor_data(os.path.join(output_dir, 'validation_features.csv'), 'validation', output_dir)
 
 
 

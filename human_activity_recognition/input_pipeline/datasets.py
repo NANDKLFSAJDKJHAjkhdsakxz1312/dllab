@@ -38,46 +38,6 @@ def load(name, window_size, window_shift, batch_size, buffer_size):
         ds_val = ds_val.map(_parse_example)
         ds_test = ds_test.map(_parse_example)
 
-        def plot_data_with_labels(dataset, title, output_dir, color_map):
-            """visualizing original data and distribution"""
-            features = []
-            labels = []
-            for feature_batch, label_batch in dataset:
-                features.extend(feature_batch.numpy())
-                labels.extend(label_batch.numpy())
-
-            # 假设加速度计的x轴数据是特征数组中的第一个元素
-            acc_x = np.array(features)[:, :, 0]  # 修改这里以匹配您特征数据的结构
-
-            # 创建一个新的图形和轴对象
-            fig, ax = plt.subplots(figsize=(15, 5))
-
-            # 绘制加速度计的x轴数据
-            ax.plot(np.arange(len(acc_x)), acc_x, label='acc_x')
-
-            # 为不同的标签添加彩色背景
-            start_index = 0
-            current_label = labels[0]
-            for i, label in enumerate(labels):
-                if label != current_label or i == len(labels) - 1:
-                    ax.axvspan(start_index, i, color=color_map[current_label], alpha=0.5,
-                               label=f'Label {current_label}')
-                    start_index = i
-                    current_label = label
-
-            # 添加图例和标签
-            ax.legend()
-            ax.set_title(title)
-            ax.set_xlabel('Time')
-            ax.set_ylabel('Sensor Reading')
-
-            # 显示图表
-            plt.show()
-
-
-
-
-
         # prepare the training validation and test datasets
         ds_train = ds_train.shuffle(buffer_size)
         ds_train = ds_train.batch(batch_size)
