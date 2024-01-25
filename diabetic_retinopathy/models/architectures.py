@@ -42,16 +42,10 @@ def simple_cnn(
     for i in range(n_blocks):
         out = cnn_block(out, base_filters * 2 ** (i))
     out = tf.keras.layers.GlobalAveragePooling2D()(out)
-    out = tf.keras.layers.Dense(dense_units, activation=tf.nn.relu)(out)
+    out = tf.keras.layers.Dense(dense_units, activation=tf.nn.relu, kernel_regularizer=tf.keras.regularizers.l2(0.01))(out)
     out = tf.keras.layers.Dropout(dropout_rate)(out)
     outputs = tf.keras.layers.Dense(
         n_classes, activation="sigmoid" if n_classes == 2 else "softmax"
     )(out)
     model = tf.keras.Model(inputs=inputs, outputs=outputs, name="simple_cnn")
-    optimizer = tf.keras.optimizers.Adam(learning_rate=1e-5)
-    model.compile(
-        optimizer=optimizer,
-        loss="binary_crossentropy" if n_classes == 2 else "categorical_crossentropy",
-        metrics=["accuracy"],
-    )
     return model

@@ -1,11 +1,15 @@
 # Architectures
-
+rnn_model.lstm_units = 64
+rnn_model.dense_units = 64
+rnn_model.dropout_rate = 0.5
 
 # Layers
 
 
 # Training
-
+train.Trainer.total_steps =50
+train.Trainer.log_interval = 10
+train.Trainer.ckpt_interval = 10
 
 # Input pipeline
 load.name = 'HAPT'

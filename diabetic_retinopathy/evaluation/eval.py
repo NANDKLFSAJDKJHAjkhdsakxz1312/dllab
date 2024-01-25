@@ -3,30 +3,18 @@ from .metrics import ConfusionMatrix
 import os
 
 
-def count_classes(ds):
-    class_counts = {}
-    for images, labels in ds:
-        for label in labels.numpy():
-            class_counts[label] = class_counts.get(label, 0) + 1
-    return class_counts
-
 def evaluate(model, ds_test, checkpoint_paths, num_classes, label):
-    # # Load Checkpoints
-    # optimizer = tf.keras.optimizers.Adam(learning_rate=0.0000001)
-    # ckpt = tf.train.Checkpoint(model=model, optimizer=optimizer)
-    # latest_ckpt = tf.train.latest_checkpoint(checkpoint_paths)
-    # if latest_ckpt:
-    #     ckpt.restore(ckpt).expect_partial()
-    #     print(f"Restored from {latest_ckpt}")
-    # model.compile(
-    #     optimizer=optimizer,
-    #     loss="binary_crossentropy" if num_classes == 2 else "categorical_crossentropy",
-    #     metrics=["accuracy"]
-    # )
-
-    # Load Models
-    saved_model_path = os.path.join(checkpoint_paths, "saved_model")
-    model = tf.keras.models.load_model(saved_model_path)
+    # Load Checkpoints
+    checkpoint = tf.train.Checkpoint(step=tf.Variable(1), optimizer=tf.keras.optimizers.Adam(), net=model)
+    checkpoint_manager = tf.train.CheckpointManager(checkpoint, checkpoint_paths, max_to_keep=10)
+    checkpoint.restore(checkpoint_manager.latest_checkpoint)
+    if checkpoint_manager.latest_checkpoint:
+        tf.print("Restored from {}".format(checkpoint_manager.latest_checkpoint))
+    else:
+        tf.print("Initializing from scratch.")
+    model.compile(optimizer=tf.keras.optimizers.Adam(),
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+                  metrics=["accuracy"])
 
     test_loss = tf.keras.metrics.Mean(name="test_loss")
     test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name="test_accuracy")
@@ -46,11 +34,6 @@ def evaluate(model, ds_test, checkpoint_paths, num_classes, label):
     # Iterate over the test dataset
     for test_images, test_labels in ds_test:
         test_step(test_images, test_labels)
-
-    class_counts = count_classes(ds_test)
-    print("Class Distribution in Test Dataset:")
-    for class_label, count in class_counts.items():
-        print(f"Class {class_label}: {count} samples")
 
     # Log and return the test metrics
     print(

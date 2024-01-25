@@ -42,6 +42,12 @@ def preprocess(file_name, data_dir, labels_file, output_dir):
         label_value = int(label_row[2])
         sequence_labels[start_index:end_index + 1] = label_value
 
+    # create a boolean index array, marking all labels that are not -1
+    valid_indices = sequence_labels != -1
+    # change labels from 1-12 to 0-11
+    sequence_labels = sequence_labels[valid_indices] - 1
+    combined_data = combined_data[valid_indices]
+
     # define train, validation and test experiment ranges
     train_exp_id = range(1, 44)
     val_exp_id = range(56, 62)

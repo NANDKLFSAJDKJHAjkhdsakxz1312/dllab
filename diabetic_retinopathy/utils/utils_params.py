@@ -7,7 +7,7 @@ def gen_run_folder(path_model_id=""):
 
     if not os.path.isdir(path_model_id):
         path_model_root = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), os.pardir, os.pardir, "experiments")
+            os.path.join(os.path.dirname(__file__), os.pardir, "experiments")
         )
         # date_creation = datetime.datetime.now().strftime("%Y-%m-%dT%H-%M-%S-%f")
         # run_id = "run_" + date_creation

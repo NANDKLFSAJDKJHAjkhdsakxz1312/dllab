@@ -6,13 +6,13 @@ from train import Trainer
 from evaluation.eval import evaluate
 from input_pipeline import datasets
 from utils import utils_params, utils_misc
-from models.architectures import rnn
+from models.architectures import rnn_model
 import os
 import wandb
 
 
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean("train", False, "Specify whether to train or evaluate a model.")
+flags.DEFINE_boolean("train", True, "Specify whether to train or evaluate a model.")
 
 
 def main(argv):
@@ -39,7 +39,7 @@ def main(argv):
     print("Datasets loaded.")
 
     # model
-    model = rnn(input_shape=(250, 6), n_classes=12)
+    model = rnn_model(input_shape=(250, 6), n_classes=12)
     print("Model initialized.")
 
     if FLAGS.train:
@@ -51,7 +51,8 @@ def main(argv):
 
     else:
         print("Starting evaluation...")
-        evaluate(model, ds_test, run_paths, num_classes, label)
+        checkpoint_paths = run_paths["path_ckpts_train"]
+        evaluate(model, ds_test, checkpoint_paths)
 
 
 if __name__ == "__main__":

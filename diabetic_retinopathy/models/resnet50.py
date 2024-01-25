@@ -20,7 +20,7 @@ def build_model(input_shape, num_classes):
     x = Dropout(0.7)(x)
     predictions = Dense(num_classes=2, activation="softmax")(x)
     model = Model(inputs=base_model.input, outputs=predictions)
-    adam = tf.keras.optimizers.Adam(lr=0.0001)
+    optimizer = tf.keras.optimizers.Adam()
     model.compile(optimizer=adam, loss="binary_crossentropy", metrics=["accuracy"])
     model.summary()
 

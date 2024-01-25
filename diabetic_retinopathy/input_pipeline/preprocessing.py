@@ -17,7 +17,7 @@ def preprocess(image, label, img_height=256, img_width=256):
 
 def augment(image, label):
     """Data augmentation"""
-    choice = tf.random.uniform(shape=[],minval=0,maxval=4,dtype=tf.int32)
+    choice = tf.random.uniform(shape=[], minval=0, maxval=4, dtype=tf.int32)
     # Random contrast adjustment
     #Randomly rotate the image
     if choice == 0:
