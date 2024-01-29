@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import numpy as np
 import tensorflow  as tf
-import matplotlib.pyplot as plt
 
 def write_tf_record_files(window_size, window_shift):
     """build TFRecord file of HAPT dataset"""

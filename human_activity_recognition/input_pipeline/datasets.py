@@ -5,7 +5,6 @@ import os
 import gin
 import logging
 from .createTFrecord import write_tf_record_files
-import matplotlib.pyplot as plt
 
 @gin.configurable
 def load(name, window_size, window_shift, batch_size, buffer_size):
@@ -22,16 +21,16 @@ def load(name, window_size, window_shift, batch_size, buffer_size):
         ds_train = tf.data.TFRecordDataset(train_tfrecord_path)
         ds_val = tf.data.TFRecordDataset(validation_tfrecord_path)
         ds_test = tf.data.TFRecordDataset(test_tfrecord_path)
-        feature_description = {
-            'window_sequence': tf.io.FixedLenFeature([], tf.string),
-            'label': tf.io.FixedLenFeature([], tf.string),
-        }
 
         # parse data from bytes format into original sequence format
         def _parse_example(window_example):
-            temp = tf.io.parse_single_example(window_example, feature_description)
-            feature_window = tf.io.parse_tensor(temp['window_sequence'], tf.float64)
-            label_window = tf.io.parse_tensor(temp['label'], tf.int64)
+            keys_to_features = {
+                'window_sequence': tf.io.FixedLenFeature([], tf.string),
+                'label': tf.io.FixedLenFeature([], tf.string),
+            }
+            parsed_features = tf.io.parse_single_example(window_example, keys_to_features)
+            feature_window = tf.io.parse_tensor(parsed_features['window_sequence'], tf.float64)
+            label_window = tf.io.parse_tensor(parsed_features['label'], tf.int32)
             return feature_window, label_window
 
         ds_train = ds_train.map(_parse_example)

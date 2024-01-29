@@ -13,9 +13,9 @@ vgg_block.kernel_size = (3, 3)
 cnn_block.kernel_size = (3, 3)
 
 # Training
-train.Trainer.total_steps =50
-train.Trainer.log_interval = 10
-train.Trainer.ckpt_interval = 10
+train.Trainer.total_steps =1000
+train.Trainer.log_interval = 100
+train.Trainer.ckpt_interval = 100
 
 # Input pipeline
 load.name = 'idrid'
