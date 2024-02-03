@@ -25,7 +25,6 @@ def cnn_block(inputs, filters, kernel_size):
     out = tf.keras.layers.Conv2D(filters, kernel_size, padding='same',
                                  kernel_initializer=tf.keras.initializers.GlorotUniform())(inputs)
     out = tf.keras.layers.BatchNormalization()(out)
-    out = tf.keras.layers.Activation('relu')(out)
     out = tf.keras.layers.MaxPool2D((2, 2))(out)
 
     return out
