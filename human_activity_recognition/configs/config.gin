@@ -2,6 +2,12 @@
 rnn_model.lstm_units = 64
 rnn_model.dense_units = 64
 rnn_model.dropout_rate = 0.5
+lstm_model.num_recurrent_layers = 3
+lstm_model.num_fc_layers = 2
+lstm_model.num_hidden_units = 32
+lstm_model.dropout_rate = 0.5
+lstm_model.learning_rate = 0.001
+lstm_model.stateful = True
 
 # Layers
 
@@ -17,5 +23,6 @@ load.window_size = 250
 load.window_shift = 125
 load.batch_size = 32
 load.buffer_size = 512
+load.drop_remainder = False
 
 
