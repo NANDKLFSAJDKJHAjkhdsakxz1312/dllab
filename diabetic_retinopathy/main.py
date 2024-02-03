@@ -2,27 +2,24 @@ import gin
 import logging
 from absl import app, flags
 from train import Trainer
-from evaluation.eval import evaluate
+from train_regression import Trainer_regression
+from evaluation.eval import evaluate, evaluate_regression
 from input_pipeline import datasets
 from utils import utils_params, utils_misc
-from models.architectures import vgg_like,simple_cnn
-from input_pipeline.createTFRecord import create_tfrecord
-from input_pipeline.createTFRecord import prepare_image_paths_and_labels
+from models.architectures import vgg_like, simple_cnn, simple_cnn_regression
+from models.transferlearning import resnet50, densenet121
 import os
 import wandb
 
-
+model_name = 'simple_cnn_regression'
+folder = 'simple_cnn_regression'
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean("train", False, "Specify whether to train or evaluate a model.")
+flags.DEFINE_boolean("train", True, "Specify whether to train or evaluate a model.")
 
 
 def main(argv):
     # generate folder structures
-    run_paths = utils_params.gen_run_folder()
-
-    # set loggers
-    log_file_path = os.path.join(run_paths["path_logs_train"], "training.log")
-    utils_misc.set_loggers(log_file_path, logging.INFO)
+    run_paths = utils_params.gen_run_folder(folder)
 
     # gin-config
     gin.parse_config_files_and_bindings(["configs/config.gin"], [])
@@ -35,44 +32,56 @@ def main(argv):
         config=utils_params.gin_config_to_readable_dictionary(gin.config._CONFIG)
     )
 
-    # Prepare images and labels
-    (
-        train_image_paths,
-        train_labels,
-        val_image_paths,
-        val_labels,
-        test_image_paths,
-        test_labels,
-        num_classes,
-        label
-    ) = prepare_image_paths_and_labels()
-
-    # Create TF files
-    create_tfrecord(train_image_paths, train_labels, "train.tfrecord")
-    create_tfrecord(val_image_paths, val_labels, "val.tfrecord")
-    create_tfrecord(test_image_paths, test_labels, "test.tfrecord")
-    print("TfRecord files created.")
-
     # setup pipeline
-    ds_train, ds_val, ds_test = datasets.load()
+    ds_train, ds_val, ds_test, ds_info = datasets.load()
     print("Datasets loaded.")
 
+    # # if binary classification
+    # num_classes = 2
+    # labels = ['0', '1']
+
+    #if Multi-class classification
+    num_classes = 5
+    labels = ['0', '1', '2', '3', '4']
     # model
-    #model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
-    model = simple_cnn(input_shape=(256, 256, 3), n_classes=2)
+    if model_name == 'vgg_Like':
+        model = vgg_like(input_shape=(256, 256, 3), num_classes=num_classes)
+    elif model_name == 'simple_cnn':
+        model = simple_cnn(input_shape=(256, 256, 3), num_classes=num_classes)
+    elif model_name == 'resnet50':
+        model = resnet50(input_shape=(256, 256, 3), num_classes=num_classes)
+    elif model_name == 'densenet121':
+        model = densenet121(input_shape=(256, 256, 3), num_classes=num_classes)
+    elif model_name == 'simple_cnn_regression':
+        model = simple_cnn_regression(input_shape=(256, 256, 3))
     print("Model initialized.")
+
 
     if FLAGS.train:
         print("Starting training...")
-        trainer = Trainer(model, ds_train, ds_val, run_paths)
-        for _ in trainer.train():
-            continue
-        trainer.save_model()
+        # set training loggers
+        utils_misc.set_loggers(run_paths['path_logs_train'], logging.INFO)
+        # train
+        if model_name == 'simple_cnn_regression':
+            trainer_regression = Trainer_regression(model, ds_train, ds_val, run_paths)
+            for _ in trainer_regression.train():
+                continue
+            trainer_regression.save_model()
+        else:
+            trainer = Trainer(model, ds_train, ds_val, run_paths)
+            for _ in trainer.train():
+                continue
+            trainer.save_model()
 
     else:
         print("Starting evaluation...")
+        # set evaluation loggers
+        utils_misc.set_loggers(run_paths['path_logs_eval'], logging.INFO)
         checkpoint_paths = run_paths["path_ckpts_train"]
-        evaluate(model, ds_test, checkpoint_paths, num_classes, label)
+        if model_name == 'simple_cnn_regression':
+            evaluate_regression(model, ds_test, checkpoint_paths)
+        else:
+            evaluate(model, ds_test, checkpoint_paths, num_classes, labels)
 
 
 if __name__ == "__main__":
