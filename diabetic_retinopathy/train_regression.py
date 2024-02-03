@@ -6,7 +6,7 @@ import wandb
 
 
 @gin.configurable
-class Trainer(object):
+class Trainer_regression(object):
     def __init__(
         self,
         model,
@@ -38,14 +38,13 @@ class Trainer(object):
         )
 
         # Loss objective
-        self.loss_object = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        self.loss_object = tf.keras.losses.Huber()
 
         # Metrics
         self.train_loss = tf.keras.metrics.Mean(name="train_loss")
-        self.train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name="train_accuracy")
-
         self.val_loss = tf.keras.metrics.Mean(name="val_loss")
-        self.val_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name="val_accuracy")
+        self.train_mae = tf.keras.metrics.MeanAbsoluteError(name="train_mae")
+        self.val_mae = tf.keras.metrics.MeanAbsoluteError(name="val_mae")
 
         # set profiling
         self.profiler_options = tf.profiler.experimental.ProfilerOptions(
@@ -65,7 +64,7 @@ class Trainer(object):
         self.optimizer.apply_gradients(zip(gradients, self.model.trainable_variables))
 
         self.train_loss(loss)
-        self.train_accuracy(labels, predictions)
+        self.train_mae(labels, predictions)
 
     @tf.function
     def val_step(self, images, labels):
@@ -75,7 +74,7 @@ class Trainer(object):
         t_loss = self.loss_object(labels, predictions)
 
         self.val_loss(t_loss)
-        self.val_accuracy(labels, predictions)
+        self.val_mae(labels, predictions)
 
     def train(self):
         # set the profiler (optional)
@@ -98,7 +97,7 @@ class Trainer(object):
             if step % self.log_interval == 0:
                 # Reset test metrics
                 self.val_loss.reset_states()
-                self.val_accuracy.reset_states()
+                self.val_mae.reset_states()
 
                 for val_images, val_labels in self.ds_val:
                     self.val_step(val_images, val_labels)
@@ -106,29 +105,29 @@ class Trainer(object):
                 info = (
                     f"Step {step}, "
                     f"Loss: {self.train_loss.result():.4f}, "
-                    f"Accuracy: {self.train_accuracy.result() * 100:.2f}%, "
+                    f"MAE: {self.train_mae.result() * 100:.2f}%, "
                     f"Validation Loss: {self.val_loss.result():.4f}, "
-                    f"Validation Accuracy: {self.val_accuracy.result() * 100:.2f}%"
+                    f"Validation MAE: {self.val_mae.result() * 100:.2f}%"
                 )
                 print(info)
 
-                template = "Step {}, Loss: {}, Accuracy: {}, Validation Loss: {}, Validation Accuracy: {}"
+                template = "Step {}, Loss: {}, MAE: {}, Validation Loss: {}, Validation MAE: {}"
                 logging.info(
                     template.format(
                         step,
                         self.train_loss.result(),
-                        self.train_accuracy.result() * 100,
+                        self.train_mae.result() * 100,
                         self.val_loss.result(),
-                        self.val_accuracy.result() * 100,
+                        self.val_mae.result() * 100,
                     )
                 )
 
                 # wandb logging
                 wandb.log(
                     {
-                        "train_acc": self.train_accuracy.result() * 100,
+                        "train_mae": self.train_mae.result() * 100,
                         "train_loss": self.train_loss.result(),
-                        "val_acc": self.val_accuracy.result() * 100,
+                        "val_mae": self.val_mae.result() * 100,
                         "val_loss": self.val_loss.result(),
                         "step": step,
                     }
@@ -137,15 +136,15 @@ class Trainer(object):
                 # Write summary to tensorboard
                 with self.summary_writer.as_default():
                     tf.summary.scalar("Loss", self.train_loss.result(), step=step)
-                    tf.summary.scalar("Accuracy", self.train_accuracy.result(), step=step)
+                    tf.summary.scalar("MAE", self.train_mae.result(), step=step)
                     tf.summary.scalar("Validation Loss", self.val_loss.result(), step=step)
-                    tf.summary.scalar("Validation Accuracy", self.val_accuracy.result(), step=step)
+                    tf.summary.scalar("Validation MAE", self.val_mae.result(), step=step)
 
                 # Reset train metrics
                 self.train_loss.reset_states()
-                self.train_accuracy.reset_states()
+                self.train_mae.reset_states()
 
-                yield self.val_accuracy.result().numpy()
+                yield self.val_mae.result().numpy()
 
             if step % self.ckpt_interval == 0:
                 logging.info(
@@ -163,7 +162,7 @@ class Trainer(object):
                 # stop the profiler
                 # tf.profiler.experimental.stop()
 
-                return self.val_accuracy.result().numpy()
+                return self.val_mae.result().numpy()
 
     def save_model(self):
         save_path = os.path.join(self.run_paths["path_ckpts_train"], "saved_model")

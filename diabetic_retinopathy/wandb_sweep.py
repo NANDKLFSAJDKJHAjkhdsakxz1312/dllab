@@ -2,19 +2,18 @@ import logging
 import wandb
 import gin
 import math
-
 from input_pipeline.datasets import load
-from models.architectures import vgg_like
-from models.architectures import simple_cnn
+from models.architectures import vgg_like, simple_cnn
+from models.transferlearning import  resnet50, densenet201
 from train import Trainer
 from utils import utils_params, utils_misc
 from input_pipeline.createTFRecord import create_tfrecord
 from input_pipeline.createTFRecord import prepare_image_paths_and_labels
 import os
 
-
+model_name = 'simple_cnn'
 def train_func():
-    with wandb.init() as run:
+    with wandb.init(project="sweep_diabetic") as run:
         gin.clear_config()
         # Hyperparameters
         bindings = []
@@ -23,10 +22,6 @@ def train_func():
 
         # generate folder structures
         run_paths = utils_params.gen_run_folder(",".join(bindings))
-
-        # set loggers
-        log_file_path = os.path.join(run_paths["path_logs_train"], "sweep.log")
-        utils_misc.set_loggers(log_file_path, logging.INFO)
 
         # gin-config
         gin.parse_config_files_and_bindings(["configs/config.gin"], bindings)
@@ -54,38 +49,42 @@ def train_func():
         ds_train, ds_val, ds_test = load()
 
         # model
-        # model = vgg_like(input_shape=ds_info.features["image"].shape, n_classes=ds_info.features["label"].num_classes)
-        model = simple_cnn(input_shape=(256, 256, 3), n_classes=2)
+        if model_name == 'VGG16':
+            model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
+        elif model_name == 'simple_cnn':
+            model = simple_cnn(input_shape=(256, 256, 3), n_classes=2)
+        elif model_name == 'resnet50':
+            model = resnet50(input_shape=(256, 256, 3), n_classes=2)
+        elif model_name == 'densenet201':
+            model = densenet201(input_shape=(256, 256, 3), n_classes=2)
+
+        # set loggers
+        utils_misc.set_loggers(run_paths['path_logs_train'], logging.INFO)
+
+        # train the model
         trainer = Trainer(model, ds_train, ds_val, run_paths)
         for _ in trainer.train():
             continue
 
 
 sweep_config = {
-    "name": "mnist-example-sweep",
-    "method": "random",
+    "name": "idrid-sweep",
+    "method": "grid",
     "metric": {"name": "val_acc", "goal": "maximize"},
     "parameters": {
-        "Trainer.total_steps": {"values": [10]},
+        "preprocess.img_height": {"value": 256},
+        "preprocess.img_width": {"value": 256},
+        "Trainer.total_steps": {"values": [10000]},
         "simple_cnn.base_filters": {
-            "distribution": "q_log_uniform",
-            "q": 1,
-            "min": math.log(8),
-            "max": math.log(128),
+            "values": [8, 16, 32, 64]
         },
         "simple_cnn.n_blocks": {
-            "distribution": "q_uniform",
-            "q": 1,
-            "min": 2,
-            "max": 6,
+            "values": [1, 2, 3, 4]
         },
         "simple_cnn.dense_units": {
-            "distribution": "q_log_uniform",
-            "q": 1,
-            "min": math.log(16),
-            "max": math.log(256),
+            "values": [16, 32, 64, 128, 256]
         },
-        "simple_cnn.dropout_rate": {"distribution": "uniform", "min": 0.1, "max": 0.9},
+        "simple_cnn.dropout_rate": {"values": [0.1, 0.2, 0.3, 0.4]},
     },
 }
 sweep_id = wandb.sweep(sweep_config)
