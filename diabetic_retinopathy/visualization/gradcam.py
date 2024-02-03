@@ -1,72 +1,93 @@
 import numpy as np
-import cv2
+import matplotlib.pyplot as plt
 import tensorflow as tf
-from diabetic_retinopathy.models.architectures import simple_cnn
-import gin
+from keras.preprocessing.image import load_img
+import cv2
+from guidedBacprop import GuidedBackprop,deprocess_image
+
+def grad_cam(model, images,original_image):
+
+    # extract the corresponding layer result from the model
+    grad_cam_model = tf.keras.models.Model([model.inputs], [model.get_layer('conv2d_2').output, model.get_layer('dense_1').output])
+
+    # calculate the gradients of the predictions to the feature maps in the last convolutional layer
+    with tf.GradientTape() as tape:
+        conv_outputs, predictions = grad_cam_model(images, training=False)
+        tape.watch(conv_outputs)
+        idx = np.argmax(predictions[0])
+        top_class = predictions[:, idx]
+    grads = tape.gradient(top_class, conv_outputs)
+
+    # calculate the CAM
+    weights = tf.reduce_mean(grads, axis=(0, 1, 2)).numpy()
+    output = conv_outputs.numpy()[0]
+    for i, w in enumerate(weights):
+        output[:, :, i] *= w
+
+    cam = np.mean(output, axis=-1)
+    cam = cv2.resize(cam, (images.shape[1], images.shape[2]))
+
+    # normalize the CAM
+    cam = np.maximum(cam, 0) / (cam.max() + 1e-16)
+    cam_image = cam * 255
+    cam_image = np.clip(cam_image, 0, 255).astype('uint8')
+
+    # generate the CAM and Grad-CAM images
+    cam_image = cv2.applyColorMap(cam_image, cv2.COLORMAP_RAINBOW)
+    grad_cam_image = cv2.addWeighted(original_image, 0.5, cam_image, 0.5, 0)
+
+    return grad_cam_image, cam, idx
 
 
-@gin.configurable
-class GradCAM:
-    def __init__(self, model, classIdx, layerName=None):
-        self.model = model
-        self.classIdx = classIdx
-        self.layerName = layerName
-        if self.layerName is None:
-            self.layerName = self.find_target_layer()
+saved_model_path = '/Users/zhouzexu/Documents/6_codePractice/04_dl/gradcam/saved_model'
+model = tf.keras.models.load_model(saved_model_path)
+model.summary()
 
-    def find_target_layer(self):
-        for layer in reversed(self.model.layers):
-            if len(layer.output_shape) == 4:
-                return layer.name
-        raise ValueError("Could not find 4D layer, Cannot apply GradCAM.")
+image = np.array(load_img("IDRiD_022.jpg"))
+image_size_orig = np.shape(image)[0:2]
+image_size_resize = (image_size_orig[:]/np.max(image_size_orig[:])*256).astype("int32")
+image = tf.cast(image, tf.float32) / 255.0
+image = tf.image.resize_with_pad(image, 256, 256)
+# image_orig = (image.numpy()*255.0).astype("uint8")
+image = image.numpy().astype("uint8")
+image = np.expand_dims(image, axis=0)
 
-    def compute_heatmap(self, image, eps=1e-8):
-        gradModel = tf.keras.models.Model(
-            [self.model.inputs],
-            [self.model.get_layer(self.layerName).output, self.model.output],
-        )
+# Grad_cam
+image_orig = cv2.cvtColor(cv2.imread("IDRiD_022.jpg"),cv2.COLOR_BGR2RGB)
+image_orig = tf.cast(image_orig, tf.float32)
+image_orig = tf.image.resize_with_pad(image_orig, 256, 256)
+image_orig = image_orig.numpy().astype("uint8")
+grad_cam_image, cam, idx = grad_cam(model, image,image_orig)
 
-        # record operations for automatic differentiation
-        with tf.GradientTape() as tape:
-            inputs = tf.cast(image, tf.float32)
-            (convOutputs, predictions) = gradModel(inputs)
-            loss = predictions[:, self.classIdx]
-        grads = tape.gradient(loss, convOutputs)
+# Guided backpropagation
+guidedBP = GuidedBackprop(model=model,layerName="conv2d_2")
+gb = guidedBP.guided_backprop(image)
+gb_im = deprocess_image(gb)
+gb_im = cv2.cvtColor(gb_im, cv2.COLOR_BGR2RGB)
 
-        # compute the guided gradients
-        castConvOutputs = tf.cast(convOutputs > 0, "float32")
-        castGrads = tf.cast(grads > 0, "float32")
-        guidedGrads = castConvOutputs * castGrads * grads
+# Guided grad-cam
+cam_expand = np.dstack((cam,cam,cam)) # size: [256,256] to [256,256,3]
+guided_grad_cam = np.multiply(cam_expand,gb_im).astype("uint8")
 
-        convOutputs = convOutputs[0]
-        guidedGrads = guidedGrads[0]
-
-        # compute the average of the gradient values, and using them
-        # as weights, compute the ponderation of the filters with
-        # respect to the weights
-        weights = tf.reduce_mean(guidedGrads, axis=(0, 1))
-        cam = tf.reduce_sum(tf.multiply(weights, convOutputs), axis=-1)
-
-        # grab the spatial dimensions of the input image and resize
-        # the output class activation map to match the input image
-        # dimensions
-        (w, h) = (image.shape[2], image.shape[1])
-        heatmap = cv2.resize(cam.numpy(), (w, h))
-        # normalize the heatmap such that all values lie in the range
-        # [0, 1], scale the resulting values to the range [0, 255],
-        # and then convert to an unsigned 8-bit integer
-        numer = heatmap - np.min(heatmap)
-        denom = (heatmap.max() - heatmap.min()) + eps
-        heatmap = numer / denom
-        heatmap = (heatmap * 255).astype("uint8")
-        # return the resulting heatmap to the calling function
-        return heatmap
-
-    def overlay_heatmap(self, heatmap, image, alpha=0.5, colormap=cv2.COLORMAP_VIRIDIS):
-        # apply the supplied color map to the heatmap and then
-        # overlay the heatmap on the input image
-        heatmap = cv2.applyColorMap(heatmap, colormap)
-        output = cv2.addWeighted(image, alpha, heatmap, 1 - alpha, 0)
-        # return a 2-tuple of the color mapped heatmap and the output,
-        # overlaid image
-        return (heatmap, output)
+# Plot result
+fig, axs = plt.subplots(1,4)
+fig.set_figheight(3)
+fig.set_figwidth(13)
+# Crop the picture from [256,256] to [170,256]
+image_orig = image_orig[(256-image_size_resize[0])//2:(256+image_size_resize[0])//2,:]
+axs[0].imshow(image_orig)
+axs[0].axis('off')
+axs[0].set_title("Original Image")
+grad_cam_image = grad_cam_image[(256-image_size_resize[0])//2:(256+image_size_resize[0])//2,:]
+axs[1].imshow(grad_cam_image)
+axs[1].axis('off')
+axs[1].set_title("Grad-CAM")
+gb_im = gb_im[(256-image_size_resize[0])//2:(256+image_size_resize[0])//2,:]
+axs[2].imshow(gb_im)
+axs[2].axis('off')
+axs[2].set_title("Guided Backpropagation")
+guided_grad_cam = guided_grad_cam[(256-image_size_resize[0])//2:(256+image_size_resize[0])//2,:]
+axs[3].imshow(guided_grad_cam)
+axs[3].axis('off')
+axs[3].set_title("Guided Grad-CAM")
+plt.show()

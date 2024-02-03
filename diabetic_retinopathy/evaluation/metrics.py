@@ -53,15 +53,15 @@ class ConfusionMatrix(tf.keras.metrics.Metric):
         print(df)
 
     def plot(self):
-        self.labels = ["DR", "RDR"]
         cm = self.confusion_matrix.numpy()
+        plt.figure(figsize=(10, 8))
         plt.imshow(cm, cmap=plt.cm.Blues)
         plt.xticks(range(self.num_classes), self.labels, rotation=45)
         plt.yticks(range(self.num_classes), self.labels)
         plt.colorbar()
         plt.xlabel("True Labels")
         plt.ylabel("Predicted Labels")
-        plt.title("Confusion matrix")
+        plt.title("Binary Confusion matrix")
 
         thresh = cm.max() / 2
         for x in range(self.num_classes):
@@ -76,6 +76,8 @@ class ConfusionMatrix(tf.keras.metrics.Metric):
                     color="white" if info > thresh else "black",
                 )
         plt.tight_layout()
+
+        plt.subplots_adjust(upper=0.3, bottom=0.1)
         plt.savefig("confusion_matrices.png")
         plt.show()
 

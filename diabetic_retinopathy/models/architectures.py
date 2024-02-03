@@ -1,10 +1,10 @@
 import gin
 import tensorflow as tf
-from .layers import vgg_block,cnn_block
-from keras.utils import plot_model
+from .layers import vgg_block, cnn_block
+
 
 @gin.configurable
-def vgg_like(input_shape, n_classes, base_filters, n_blocks, dense_units, dropout_rate):
+def vgg_like(input_shape, num_classes, base_filters, n_blocks, dense_units, dropout_rate):
     """Defines a VGG-like architecture.
 
     Parameters:
@@ -28,14 +28,15 @@ def vgg_like(input_shape, n_classes, base_filters, n_blocks, dense_units, dropou
     out = tf.keras.layers.GlobalAveragePooling2D()(out)
     out = tf.keras.layers.Dense(dense_units, activation=tf.nn.relu)(out)
     out = tf.keras.layers.Dropout(dropout_rate)(out)
-    outputs = tf.keras.layers.Dense(n_classes)(out)
+    outputs = tf.keras.layers.Dense(num_classes)(out)
     model = tf.keras.Model(inputs=inputs, outputs=outputs, name='vgg_like')
     model.summary()
     return model
 
+
 @gin.configurable
 def simple_cnn(
-    input_shape, n_classes, base_filters, n_blocks, dense_units, dropout_rate, kernel_regularizer
+        input_shape, num_classes, base_filters, n_blocks, dense_units, dropout_rate
 ):
     assert n_blocks > 0, "Number of blocks has to be at least 1."
 
@@ -44,11 +45,29 @@ def simple_cnn(
     for i in range(n_blocks):
         out = cnn_block(out, base_filters * 2 ** (i))
     out = tf.keras.layers.GlobalAveragePooling2D()(out)
-    out = tf.keras.layers.Dense(dense_units, activation=tf.nn.relu, kernel_regularizer=tf.keras.regularizers.l2(kernel_regularizer))(out)
+    out = tf.keras.layers.Dense(dense_units, activation=tf.nn.relu)(out)
     out = tf.keras.layers.Dropout(dropout_rate)(out)
     outputs = tf.keras.layers.Dense(
-        n_classes, activation="sigmoid" if n_classes == 2 else "softmax"
+        num_classes, activation="sigmoid" if num_classes == 2 else "softmax"
     )(out)
     model = tf.keras.Model(inputs=inputs, outputs=outputs, name="simple_cnn")
+    model.summary()
+    return model
+
+@gin.configurable
+def simple_cnn_regression(
+        input_shape, base_filters, n_blocks, dense_units, dropout_rate
+):
+    assert n_blocks > 0, "Number of blocks has to be at least 1."
+
+    inputs = tf.keras.Input(input_shape)
+    out = cnn_block(inputs, base_filters)
+    for i in range(n_blocks):
+        out = cnn_block(out, base_filters * 2 ** (i))
+    out = tf.keras.layers.GlobalAveragePooling2D()(out)
+    out = tf.keras.layers.Dense(dense_units, activation=tf.nn.relu)(out)
+    out = tf.keras.layers.Dropout(dropout_rate)(out)
+    outputs = tf.keras.layers.Dense(1, activation='linear')(out)
+    model = tf.keras.Model(inputs=inputs, outputs=outputs, name="simple_cnn_regression")
     model.summary()
     return model
