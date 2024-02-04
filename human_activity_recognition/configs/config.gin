@@ -1,13 +1,11 @@
 # Architectures
+rnn_model.rnn_units = 32
 rnn_model.lstm_units = 64
 rnn_model.dense_units = 64
 rnn_model.dropout_rate = 0.5
-lstm_model.num_recurrent_layers = 3
-lstm_model.num_fc_layers = 2
-lstm_model.num_hidden_units = 32
-lstm_model.dropout_rate = 0.5
-lstm_model.learning_rate = 0.001
-lstm_model.stateful = True
+gru_model.gru_units = 64
+gru_model.dense_units = 64
+gru_model.dropout_rate = 0.5
 
 # Layers
 

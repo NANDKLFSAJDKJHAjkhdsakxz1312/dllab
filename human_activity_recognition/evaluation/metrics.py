@@ -34,7 +34,7 @@ class ConfusionMatrix(tf.keras.metrics.Metric):
         return self.confusion_matrix
 
     def summary(self):
-        # Calculate precision, sensitivity, specificity
+        # Calculate precision, sensitivity, specificity and F1_score
         cm = self.confusion_matrix.numpy()
         data = []
 
@@ -47,7 +47,7 @@ class ConfusionMatrix(tf.keras.metrics.Metric):
             Recall = round(TP / (TP + FN), 3) if TP + FN != 0 else 0.0
             F1 = round(2 * (Precision * Recall) / (Precision + Recall), 3) if TP + FN != 0 else 0.0
             Specificity = round(TN / (TN + FP), 3) if TN + FP != 0 else 0.0
-            data.append([self.labels[i], Precision, Recall, Specificity,F1])
+            data.append([self.labels[i], Precision, Recall, Specificity, F1])
 
         df = pd.DataFrame(data, columns=["Label", "Precision", "Recall", "Specificity", "F1_Score"])
         print(df)

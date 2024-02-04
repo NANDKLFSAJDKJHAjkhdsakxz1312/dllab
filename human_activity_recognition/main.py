@@ -3,17 +3,17 @@ import logging
 import pandas as pd
 from absl import app, flags
 from train import Trainer
-from evaluation.eval import evaluate
+from evaluation.eval import evaluate, visualization
 from input_pipeline import datasets
 from utils import utils_params, utils_misc
-from models.architectures import rnn_model, lstm_model
+from models.architectures import rnn_model, gru_model
 import os
 import wandb
 
-model_name = 'lstm_model'
-folder = 'lstm_model'
+model_name = 'rnn_model'
+folder = 'rnn_model'
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean("train", True, "Specify whether to train or evaluate a model.")
+flags.DEFINE_boolean("train", False, "Specify whether to train or evaluate a model.")
 
 
 def main(argv):
@@ -34,15 +34,13 @@ def main(argv):
     # setup pipeline
     ds_train, ds_val, ds_test = datasets.load()
     print("Datasets loaded.")
-    datasets.drawing(ds_test, 'ds_test')
 
     # model
-    if model_name == 'lstm_model':
-        model = lstm_model(input_shape=(250, 6), num_classes=12, batch_size=32)
-    elif model_name == 'rnn_model':
+    if model_name == 'rnn_model':
         model = rnn_model(input_shape=(250, 6), num_classes=12)
+    elif model_name == 'gru_model':
+        model = gru_model(input_shape=(250, 6), num_classes=12)
     print("Model initialized.")
-    model.summary()
 
     if FLAGS.train:
         print("Starting training...")
@@ -56,7 +54,9 @@ def main(argv):
     else:
         print("Starting evaluation...")
         checkpoint_paths = run_paths["path_ckpts_train"]
+        visualization(model_name, model, ds_test, checkpoint_paths)
         evaluate(model, ds_test, checkpoint_paths)
+
 
 if __name__ == "__main__":
     app.run(main)
