@@ -164,29 +164,29 @@ if __name__ == "__main__":
     for file_name in experiments_users:
         preprocess(file_name, data_dir,labels_file, output_dir)
 
-    # save_combined_data(output_dir, 'train')
-    # save_combined_data(output_dir, 'test')
-    # save_combined_data(output_dir, 'validation')
-    #
-    # plot_sensor_data(os.path.join(output_dir, 'train_features.csv'), 'train', output_dir)
-    # plot_sensor_data(os.path.join(output_dir, 'test_features.csv'), 'test', output_dir)
-    # plot_sensor_data(os.path.join(output_dir, 'validation_features.csv'), 'validation', output_dir)
+    save_combined_data(output_dir, 'train')
+    save_combined_data(output_dir, 'test')
+    save_combined_data(output_dir, 'validation')
 
-    # train_file = os.path.join(output_dir, 'train_features.csv')
-    # train_label = os.path.join(output_dir, 'train_labels.npy')
-    # plot_sensor_data_with_labels(train_file, train_label, 'Train with labels', output_dir)
-    #
-    # validation_file = os.path.join(output_dir, 'validation_features.csv')
-    # validation_label = os.path.join(output_dir, 'validation_labels.npy')
-    # plot_sensor_data_with_labels(validation_file, validation_label, 'Validation with labels', output_dir)
-    #
-    # test_file = os.path.join(output_dir, 'test_features.csv')
-    # test_label = os.path.join(output_dir, 'test_labels.npy')
-    # plot_sensor_data_with_labels(test_file, test_label, 'Test with labels', output_dir)
-    #
-    # predict_file_gru = os.path.join(output_dir, 'test_features.csv')
-    # predict_label_gru = os.path.join(output_dir, 'model_predictions_gru_model.npy')
-    # plot_sensor_data_with_labels(predict_file_gru, predict_label_gru, 'gru prediction with labels', output_dir)
+    plot_sensor_data(os.path.join(output_dir, 'train_features.csv'), 'train', output_dir)
+    plot_sensor_data(os.path.join(output_dir, 'test_features.csv'), 'test', output_dir)
+    plot_sensor_data(os.path.join(output_dir, 'validation_features.csv'), 'validation', output_dir)
+
+    train_file = os.path.join(output_dir, 'train_features.csv')
+    train_label = os.path.join(output_dir, 'train_labels.npy')
+    plot_sensor_data_with_labels(train_file, train_label, 'Train with labels', output_dir)
+
+    validation_file = os.path.join(output_dir, 'validation_features.csv')
+    validation_label = os.path.join(output_dir, 'validation_labels.npy')
+    plot_sensor_data_with_labels(validation_file, validation_label, 'Validation with labels', output_dir)
+
+    test_file = os.path.join(output_dir, 'test_features.csv')
+    test_label = os.path.join(output_dir, 'test_labels.npy')
+    plot_sensor_data_with_labels(test_file, test_label, 'Test with labels', output_dir)
+
+    predict_file_gru = os.path.join(output_dir, 'test_features.csv')
+    predict_label_gru = os.path.join(output_dir, 'model_predictions_gru_model.npy')
+    plot_sensor_data_with_labels(predict_file_gru, predict_label_gru, 'gru prediction with labels', output_dir)
 
     predict_file_rnn = os.path.join(output_dir, 'test_features.csv')
     predict_label_rnn = os.path.join(output_dir, 'model_predictions_rnn_model.npy')

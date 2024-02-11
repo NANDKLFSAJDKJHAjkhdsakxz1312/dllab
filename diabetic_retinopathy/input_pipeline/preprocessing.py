@@ -3,7 +3,7 @@ import gin
 
 
 @gin.configurable
-def preprocess(image, label, img_height=256, img_width=256):
+def preprocess(image, label, img_height, img_width):
     """Dataset preprocessing: Normalizing and resizing"""
 
     # Normalize image: `uint8` -> `float32`.

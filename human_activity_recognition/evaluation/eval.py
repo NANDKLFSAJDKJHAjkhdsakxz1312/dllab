@@ -49,8 +49,6 @@ def evaluate(model, ds_test, checkpoint_paths):
                    "SIT_TO_STAND", "SIT_TO_LIE", "LIE_TO_SIT", "STAND_TO_LIE", "LIE_TO_STAND"]
     test_confusion_matrix = ConfusionMatrix(num_classes, label)
 
-    test_labels_list = []
-
     # Evaluation step
     @tf.function
     def test_step(images, labels):

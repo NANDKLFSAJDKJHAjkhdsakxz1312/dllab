@@ -76,8 +76,6 @@ class ConfusionMatrix(tf.keras.metrics.Metric):
                     color="white" if info > thresh else "black",
                 )
         plt.tight_layout()
-
-        plt.subplots_adjust(upper=0.3, bottom=0.1)
         plt.savefig("confusion_matrices.png")
         plt.show()
 

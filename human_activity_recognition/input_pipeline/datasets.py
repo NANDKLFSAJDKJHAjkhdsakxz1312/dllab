@@ -5,9 +5,10 @@ import os
 import gin
 import logging
 from .createTFrecord import write_tf_record_files
+import matplotlib.pyplot as plt
 
 @gin.configurable
-def load(name, window_size, window_shift, batch_size, buffer_size):
+def load(name, window_size, window_shift, batch_size, buffer_size, drop_remainder):
     """read TFrecord-files and prepare dataset for model"""
     if name == 'HAPT':
         logging.info(f"Preparing dataset {name}...")
@@ -37,11 +38,51 @@ def load(name, window_size, window_shift, batch_size, buffer_size):
         ds_val = ds_val.map(_parse_example)
         ds_test = ds_test.map(_parse_example)
 
+        # Visualize the original distribution
+        class_counts_before = count_classes(ds_train)
+        fig = plot_class_distribution(class_counts_before, "Original Distribution")
+        fig.savefig("original_distribution.png")
+
         # prepare the training validation and test datasets
         ds_train = ds_train.shuffle(buffer_size)
-        ds_train = ds_train.batch(batch_size)
+        ds_train = ds_train.batch(batch_size, drop_remainder=drop_remainder)
         ds_train = ds_train.repeat(-1)
-        ds_val = ds_val.batch(batch_size)
-        ds_test = ds_test.batch(batch_size)
+        ds_val = ds_val.batch(batch_size, drop_remainder=drop_remainder)
+        ds_test = ds_test.batch(batch_size, drop_remainder=drop_remainder)
 
         return ds_train, ds_val, ds_test
+
+def plot_class_distribution(class_counts, title=" "):
+    sorted_class_counts = dict(sorted(class_counts.items()))
+    labels, counts = zip(*sorted_class_counts.items())
+    labels = [str(int(label)) for label in labels]
+    fig, ax = plt.subplots(figsize=(10, 8))
+    bars = ax.bar(labels, counts)
+    ax.set_xlabel("Classes")
+    ax.set_ylabel("Number of Samples")
+    ax.set_title(title)
+    for bar in bars:
+        yval = bar.get_height()
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,
+            yval + 1,
+            int(yval),
+            ha="center",
+            va="bottom",
+        )
+    plt.tight_layout()
+    plt.show()
+    return fig
+
+# count the number of samples per class
+def count_classes(ds):
+    class_counts = {}
+    for _, label in ds.as_numpy_iterator():
+        if isinstance(label, np.ndarray):
+            for item in label.flat:
+                class_counts[item] = class_counts.get(item, 0) + 1
+        else:
+            class_counts[label] = class_counts.get(label, 0) + 1
+    return class_counts
+
+

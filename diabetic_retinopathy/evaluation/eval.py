@@ -3,9 +3,9 @@ from .metrics import ConfusionMatrix
 import wandb
 
 
-def evaluate(model, ds_test, checkpoint_paths, num_classes, labels):
+def evaluate(model, ds_test, checkpoint_paths,num_classes, labels):
     # Load Checkpoints
-    checkpoint = tf.train.Checkpoint(step=tf.Variable(1),  net=model)
+    checkpoint = tf.train.Checkpoint(step=tf.Variable(1), optimizer=tf.keras.optimizers.Adam(), net=model)
     checkpoint_manager = tf.train.CheckpointManager(checkpoint, checkpoint_paths, max_to_keep=10)
     checkpoint.restore(checkpoint_manager.latest_checkpoint)
     if checkpoint_manager.latest_checkpoint:
@@ -13,12 +13,6 @@ def evaluate(model, ds_test, checkpoint_paths, num_classes, labels):
     else:
         tf.print("Initializing from scratch.")
     step = int(checkpoint.step.numpy())
-
-    # compile the model
-    model.compile(optimizer=tf.keras.optimizers.Adam(),
-                  loss=tf.keras.losses.SparseCategoricalCrossentropy(),
-                  metrics=["accuracy"])
-
     test_loss = tf.keras.metrics.Mean(name="test_loss")
     test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name="test_accuracy")
     test_confusion_matrix = ConfusionMatrix(num_classes, labels)
@@ -27,10 +21,13 @@ def evaluate(model, ds_test, checkpoint_paths, num_classes, labels):
     @tf.function
     def test_step(images, labels):
         predictions = model(images, training=False)
-        t_loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)(labels, predictions)
+        t_loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False)(
+            tf.reshape(labels, [-1]), tf.reshape(predictions, [-1, num_classes])
+        )
         test_loss(t_loss)
-        test_accuracy(labels, predictions)
-        test_confusion_matrix.update_state(labels, tf.argmax(predictions, axis=1))
+        test_accuracy(tf.reshape(labels, [-1]), tf.reshape(predictions, [-1, num_classes]))
+        test_confusion_matrix.update_state(tf.reshape(labels, [-1]),
+                                           tf.argmax(tf.reshape(predictions, [-1, num_classes]), axis=1))
 
     # Iterate over the test dataset
     for test_images, test_labels in ds_test:
@@ -105,6 +102,5 @@ def evaluate_regression(model, ds_test, checkpoint_paths):
 
     return results
 
-    return results
 
 

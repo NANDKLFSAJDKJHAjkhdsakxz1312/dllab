@@ -6,7 +6,7 @@ from train import Trainer
 from evaluation.eval import evaluate, visualization
 from input_pipeline import datasets
 from utils import utils_params, utils_misc
-from models.architectures import rnn_model, gru_model
+from models.architectures import rnn_model, gru_model, lstm_model
 import os
 import wandb
 
@@ -40,6 +40,8 @@ def main(argv):
         model = rnn_model(input_shape=(250, 6), num_classes=12)
     elif model_name == 'gru_model':
         model = gru_model(input_shape=(250, 6), num_classes=12)
+    elif model_name == 'lstm_model':
+        model = lstm_model(input_shape=(250, 6), num_classes=12)
     print("Model initialized.")
 
     if FLAGS.train:
@@ -54,9 +56,8 @@ def main(argv):
     else:
         print("Starting evaluation...")
         checkpoint_paths = run_paths["path_ckpts_train"]
-        visualization(model_name, model, ds_test, checkpoint_paths)
+        # visualization(model_name, model, ds_test, checkpoint_paths)
         evaluate(model, ds_test, checkpoint_paths)
-
 
 if __name__ == "__main__":
     app.run(main)

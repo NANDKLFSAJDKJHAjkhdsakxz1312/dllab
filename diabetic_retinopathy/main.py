@@ -11,11 +11,11 @@ from models.transferlearning import resnet50, densenet121
 import os
 import wandb
 
-model_name = 'simple_cnn_regression'
-folder = 'simple_cnn_regression'
+model_name = 'resnet50'
+folder = 'resnet50'
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean("train", True, "Specify whether to train or evaluate a model.")
-
+flags.DEFINE_string("mode", "binary", "Specify the classification mode: binary or multiclass.")
 
 def main(argv):
     # generate folder structures
@@ -36,13 +36,15 @@ def main(argv):
     ds_train, ds_val, ds_test, ds_info = datasets.load()
     print("Datasets loaded.")
 
-    # # if binary classification
-    # num_classes = 2
-    # labels = ['0', '1']
+    if FLAGS.mode == "binary":
+        num_classes = 2
+        labels = ['0', '1']
+    elif FLAGS.mode == "multi":
+        num_classes = 5
+        labels = ['0', '1', '2', '3', '4']
+    else:
+        raise ValueError("Unsupported mode. Choose 'binary' or 'multiclass'.")
 
-    #if Multi-class classification
-    num_classes = 5
-    labels = ['0', '1', '2', '3', '4']
     # model
     if model_name == 'vgg_Like':
         model = vgg_like(input_shape=(256, 256, 3), num_classes=num_classes)

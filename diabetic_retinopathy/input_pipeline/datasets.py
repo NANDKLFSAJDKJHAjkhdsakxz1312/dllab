@@ -54,7 +54,7 @@ def load(name, data_dir):
 
         # Visualize the original distribution
         class_counts_before = count_classes(ds_train)
-        fig = plot_class_distribution(class_counts_before, "Original Binary-Class Distribution")
+        fig = plot_class_distribution(class_counts_before, "Original Binary Class Distribution")
         fig.savefig("original_binary_class_distribution.png")
 
         # resampling
@@ -68,7 +68,7 @@ def load(name, data_dir):
 
         # Visualize the distribution after resampling
         class_counts_after = count_classes(ds_train)
-        fig = plot_class_distribution(class_counts_after, "Resampled Binary_Class Distribution")
+        fig = plot_class_distribution(class_counts_after, "Resampled Binary Class Distribution")
         fig.savefig("resampled_Binary_class_distribution.png")
 
         return prepare(ds_train, ds_val, ds_test, ds_info)
@@ -91,7 +91,6 @@ def load(name, data_dir):
         def _preprocess(proto):
             parsed_features = tf.io.parse_single_example(proto, ds_info)
             image = tf.image.decode_jpeg(parsed_features["image"], channels=3)
-            image = tf.image.resize(image, (300, 300))
             label = tf.cast(parsed_features["label"], tf.int32)
             return image, label
 
@@ -109,8 +108,8 @@ def load(name, data_dir):
             plt.savefig('btgraham300_example.png',transparent=True, bbox_inches='tight', pad_inches=0)
 
         class_counts_before = count_classes(ds_train)
-        fig = plot_class_distribution(class_counts_before, "Original Multi-Class Distribution")
-        fig.savefig("original_multi_lass_distribution.png")
+        fig = plot_class_distribution(class_counts_before, "Original Multi Class Distribution")
+        fig.savefig("original_multi_class_distribution.png")
 
         # resampling
         def class_func(image, label):
@@ -123,7 +122,7 @@ def load(name, data_dir):
 
         # Visualize the distribution after resampling
         class_counts_after = count_classes(ds_train)
-        fig = plot_class_distribution(class_counts_after, "Resampled Multi_Class Distribution")
+        fig = plot_class_distribution(class_counts_after, "Resampled Multi Class Distribution")
         fig.savefig("resampled_multi_class_distribution.png")
 
         return prepare(ds_train, ds_val, ds_test, ds_info)
@@ -198,7 +197,7 @@ def get_eyepacs_tfrecord():
     train_files = []
     val_files = []
     test_files = []
-    base_path = '/home/data/tensorflow_datasets/diabetic_retinopathy_detection/btgraham-300/3.0.0/'
+    base_path = 'D:/idrid/btgraham-300/3.0.0/'
     for file in os.listdir(base_path):
         full_path = os.path.join(base_path, file)
         if 'train' in file:
