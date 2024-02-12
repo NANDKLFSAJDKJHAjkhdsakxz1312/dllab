@@ -1,6 +1,6 @@
 # Team03
 - Yixuan Wu (st178402)
-- Nan Jiang (stXXXXXX)
+- Nan Jiang (st181029)
 
 # Diabetic Retinopathy Detection
 Diabetic retinopathy, a major cause of blindness linked to diabetes, is one of the major causes of blindness in the Western world. The traditional manual screening process for DR detection, however, is both expensive and time-consuming. To address these issues, we have developed deep neural network models, which are designed to streamline the DR detection process, enhancing efficiency and reliability. 
@@ -151,3 +151,7 @@ For regression task, we choose mean squared error and mean absolute error as our
 
 
 # Human Activity Recognition
+In this task, we use 2 kinds of labeling ways: S2S and S2L. Yixuan is responsible for S2S and Nan is responsible for S2L. Thus, we have 2 kinds of codes.
+## S2S
+
+## S2L
