@@ -10,8 +10,8 @@ from models.architectures import rnn_model, gru_model, lstm_model
 import os
 import wandb
 
-model_name = 'rnn_model'
-folder = 'rnn_model'
+model_name = 'gru'
+folder = 'gru_model'
 FLAGS = flags.FLAGS
 flags.DEFINE_boolean("train", False, "Specify whether to train or evaluate a model.")
 
@@ -36,11 +36,11 @@ def main(argv):
     print("Datasets loaded.")
 
     # model
-    if model_name == 'rnn_model':
+    if model_name == 'rnn':
         model = rnn_model(input_shape=(250, 6), num_classes=12)
-    elif model_name == 'gru_model':
+    elif model_name == 'gru':
         model = gru_model(input_shape=(250, 6), num_classes=12)
-    elif model_name == 'lstm_model':
+    elif model_name == 'lstm':
         model = lstm_model(input_shape=(250, 6), num_classes=12)
     print("Model initialized.")
 
@@ -56,8 +56,8 @@ def main(argv):
     else:
         print("Starting evaluation...")
         checkpoint_paths = run_paths["path_ckpts_train"]
-        # visualization(model_name, model, ds_test, checkpoint_paths)
         evaluate(model, ds_test, checkpoint_paths)
+        visualization(model_name, model, ds_test, checkpoint_paths)
 
 if __name__ == "__main__":
     app.run(main)

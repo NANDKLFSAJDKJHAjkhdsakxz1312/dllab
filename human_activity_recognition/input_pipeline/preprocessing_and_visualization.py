@@ -184,14 +184,6 @@ if __name__ == "__main__":
     test_label = os.path.join(output_dir, 'test_labels.npy')
     plot_sensor_data_with_labels(test_file, test_label, 'Test with labels', output_dir)
 
-    predict_file_gru = os.path.join(output_dir, 'test_features.csv')
-    predict_label_gru = os.path.join(output_dir, 'model_predictions_gru_model.npy')
-    plot_sensor_data_with_labels(predict_file_gru, predict_label_gru, 'gru prediction with labels', output_dir)
-
-    predict_file_rnn = os.path.join(output_dir, 'test_features.csv')
-    predict_label_rnn = os.path.join(output_dir, 'model_predictions_rnn_model.npy')
-    plot_sensor_data_with_labels(predict_file_rnn, predict_label_rnn, 'rnn prediction with labels', output_dir)
-
 
 
 
