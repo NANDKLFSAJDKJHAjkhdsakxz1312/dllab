@@ -69,7 +69,7 @@ def xception(input_shape, trainable_rate,  num_classes):
     # preprocess input data
     preprocessed_input = tf.keras.applications.xception.preprocess_input(inputs)
 
-    # build the densenet201 model with transfer learning
+    # build the xception  model with transfer learning
     base_model = tf.keras.applications.Xception(weights='imagenet', include_top=False, input_shape=input_shape)
 
     # fine-tune from this layer onwards

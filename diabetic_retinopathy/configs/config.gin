@@ -31,10 +31,10 @@ xception.trainable_rate = 0.00001
 
 # Input pipeline
 load.name = 'idrid'
-load.data_dir = r'C:\Users\JIANGNAN\Desktop\dl-lab-23w-team03-master\dl-lab-23w-team03-master\diabetic_retinopathy'
+load.data_dir = '/misc/home/RUS_CIP/st178402/dl-lab-23w-team03/diabetic_retinopathy'
 preprocess.img_height = 256
 preprocess.img_width = 256
 prepare.buffer_size = 256
-prepare.batch_size = 32
-prepare.caching = False
-prepare_image_paths_and_labels.data_dir = r'D:\idrid\IDRID_dataset'
+prepare.batch_size = 16
+prepare.caching = True
+prepare_image_paths_and_labels.data_dir = '/misc/home/data/IDRID_dataset'

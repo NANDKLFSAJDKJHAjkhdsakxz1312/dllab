@@ -8,7 +8,7 @@ from guidedBacprop import GuidedBackprop,deprocess_image
 def grad_cam(model, images,original_image):
 
     # extract the corresponding layer result from the model
-    grad_cam_model = tf.keras.models.Model([model.inputs], [model.get_layer('conv2d_2').output, model.get_layer('dense_1').output])
+    grad_cam_model = tf.keras.models.Model([model.inputs], [model.get_layer('conv2d_3').output, model.get_layer('dense_1').output])
 
     # calculate the gradients of the predictions to the feature maps in the last convolutional layer
     with tf.GradientTape() as tape:
@@ -39,11 +39,11 @@ def grad_cam(model, images,original_image):
     return grad_cam_image, cam, idx
 
 
-saved_model_path = '/Users/zhouzexu/Documents/6_codePractice/04_dl/gradcam/saved_model'
+saved_model_path = 'D:/PycharmProjects/dl-lab-23w-team03/diabetic_retinopathy/experiments/simple_cnn/ckpts/saved_model'
 model = tf.keras.models.load_model(saved_model_path)
 model.summary()
 
-image = np.array(load_img("IDRiD_022.jpg"))
+image = np.array(load_img("IDRiD_102.jpg"))
 image_size_orig = np.shape(image)[0:2]
 image_size_resize = (image_size_orig[:]/np.max(image_size_orig[:])*256).astype("int32")
 image = tf.cast(image, tf.float32) / 255.0
@@ -53,7 +53,7 @@ image = image.numpy().astype("uint8")
 image = np.expand_dims(image, axis=0)
 
 # Grad_cam
-image_orig = cv2.cvtColor(cv2.imread("IDRiD_022.jpg"),cv2.COLOR_BGR2RGB)
+image_orig = cv2.cvtColor(cv2.imread("IDRiD_102.jpg"),cv2.COLOR_BGR2RGB)
 image_orig = tf.cast(image_orig, tf.float32)
 image_orig = tf.image.resize_with_pad(image_orig, 256, 256)
 image_orig = image_orig.numpy().astype("uint8")
@@ -90,4 +90,6 @@ guided_grad_cam = guided_grad_cam[(256-image_size_resize[0])//2:(256+image_size_
 axs[3].imshow(guided_grad_cam)
 axs[3].axis('off')
 axs[3].set_title("Guided Grad-CAM")
+plt.savefig('visual.png',dpi=300)
 plt.show()
+
