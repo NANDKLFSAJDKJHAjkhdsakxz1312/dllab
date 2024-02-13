@@ -289,7 +289,22 @@ load.name='HAPT'
 
 #### 3. Set Project Folder Location
 In the configuration file, you need to specify the location of your project files. For example, if your project is located at 
-`/misc/home/RUS_CIP/st178402/dl-lab-23w-team03/diabetic_retinopathy`, you should set it as follows:
+'D:\HAR\pythonProject\input_pipeline_s2l' , you should set it as follows:
     
   
-    load.data_dir='/misc/home/RUS_CIP/st181029/dl-lab-23w-team03/diabetic_retinopathy'
+    load.data_dir=r'D:\HAR\pythonProject\input_pipeline_s2l'
+    
+#### 4. Set Dataset Path
+The dataset is located at r'/home/data/HAPT_dataset/RawData' on the server, so set preprocessor.file_path = r'/home/data/HAPT_dataset/RawData' .
+
+### Training
+Go to main.py, set the Flag to be True, and type your model_name and folder, there are two options, namely, 'lstm' or 'crnn', then train the selected model.
+
+### Evaluation
+Go to main.py, set the flag to be False, and type your model_name and folder, same as above, then it produces the result.
+
+### visualization
+Go to visualization.py and run it. You will get the visualization for a sequence for ground truth and prediction. 
+
+### optimization
+Go to optimization.py and run it to do tuning.
