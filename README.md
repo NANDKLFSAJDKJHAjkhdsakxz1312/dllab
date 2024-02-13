@@ -310,3 +310,12 @@ Go to optimization.py and run it to do tuning.
 ### Result
 for CRNN model we have a nice balanced accuracy of 84.46% and following confusion matrix: 
 ![crnn_cm](https://media.github.tik.uni-stuttgart.de/user/7295/files/ce639535-b49c-4f42-8d84-04fd40bb5cb9)
+
+And visualization as follows:
+- Ground truth
+![Figure_3](https://media.github.tik.uni-stuttgart.de/user/7295/files/32150509-bc95-47b9-85ef-2a71899a2b5e)
+
+- Prediction
+![after](https://media.github.tik.uni-stuttgart.de/user/7295/files/e9daa2e2-f3fe-4671-8bb5-164280b7142f)
+
+
