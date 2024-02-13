@@ -1,0 +1,68 @@
+# Parameters for cnn_block:
+# ==============================================================================
+cnn_block.kernel_size = (3, 3)
+
+# Parameters for densenet121:
+# ==============================================================================
+densenet121.trainable_rate = 0.1
+
+# Parameters for load:
+# ==============================================================================
+load.data_dir = 'D:\\PycharmProjects\\dl-lab-23w-team03\\diabetic_retinopathy'
+load.name = 'eyepacs'
+
+# Parameters for prepare:
+# ==============================================================================
+prepare.batch_size = 32
+prepare.buffer_size = 256
+prepare.caching = True
+
+# Parameters for prepare_image_paths_and_labels:
+# ==============================================================================
+prepare_image_paths_and_labels.data_dir = 'D:\\idrid\\IDRID_dataset'
+
+# Parameters for preprocess:
+# ==============================================================================
+preprocess.img_height = 256
+preprocess.img_width = 256
+
+# Parameters for resnet50:
+# ==============================================================================
+resnet50.trainable_rate = 0.1
+
+# Parameters for simple_cnn:
+# ==============================================================================
+simple_cnn.base_filters = 8
+simple_cnn.dense_units = 32
+simple_cnn.dropout_rate = 0.2
+simple_cnn.n_blocks = 3
+
+# Parameters for simple_cnn_regression:
+# ==============================================================================
+simple_cnn_regression.base_filters = 8
+simple_cnn_regression.dense_units = 32
+simple_cnn_regression.dropout_rate = 0.2
+simple_cnn_regression.n_blocks = 3
+
+# Parameters for Trainer:
+# ==============================================================================
+Trainer.ckpt_interval = 100
+Trainer.log_interval = 100
+Trainer.total_steps = 10000
+
+# Parameters for Trainer_regression:
+# ==============================================================================
+Trainer_regression.ckpt_interval = 100
+Trainer_regression.log_interval = 100
+Trainer_regression.total_steps = 10000
+
+# Parameters for vgg_block:
+# ==============================================================================
+vgg_block.kernel_size = (3, 3)
+
+# Parameters for vgg_like:
+# ==============================================================================
+vgg_like.base_filters = 8
+vgg_like.dense_units = 32
+vgg_like.dropout_rate = 0.2
+vgg_like.n_blocks = 3
