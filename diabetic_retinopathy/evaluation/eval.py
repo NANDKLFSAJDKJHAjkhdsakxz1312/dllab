@@ -5,7 +5,7 @@ import wandb
 
 def evaluate(model, ds_test, checkpoint_paths,num_classes, labels):
     # Load Checkpoints
-    checkpoint = tf.train.Checkpoint(step=tf.Variable(1), optimizer=tf.keras.optimizers.Adam(), net=model)
+    checkpoint = tf.train.Checkpoint(step=tf.Variable(1), optimizer=tf.keras.optimizers.legacy.Adam(), net=model)
     checkpoint_manager = tf.train.CheckpointManager(checkpoint, checkpoint_paths, max_to_keep=10)
     checkpoint.restore(checkpoint_manager.latest_checkpoint)
     if checkpoint_manager.latest_checkpoint:
