@@ -17,23 +17,24 @@ vgg_block.kernel_size = (3, 3)
 cnn_block.kernel_size = (3, 3)
 
 # Training
-train.Trainer.total_steps = 10000
-train.Trainer.log_interval = 100
-train.Trainer.ckpt_interval = 100
-train_regression.Trainer_regression.total_steps = 10000
-train_regression.Trainer_regression.log_interval = 100
-train_regression.Trainer_regression.ckpt_interval = 100
+train.Trainer.total_steps = 20000
+train.Trainer.log_interval = 2000
+train.Trainer.ckpt_interval = 2000
+train_regression.Trainer_regression.total_steps = 20000
+train_regression.Trainer_regression.log_interval = 2000
+train_regression.Trainer_regression.ckpt_interval = 2000
 
 # Transferlearning
-resnet50.trainable_rate = 0.1
-densenet121.trainable_rate = 0.1
+resnet50.trainable_rate = 0.00001
+densenet121.trainable_rate = 0.00001
+xception.trainable_rate = 0.00001
 
 # Input pipeline
 load.name = 'idrid'
-load.data_dir = 'D:\PycharmProjects\dl-lab-23w-team03\diabetic_retinopathy'
+load.data_dir = r'C:\Users\JIANGNAN\Desktop\dl-lab-23w-team03-master\dl-lab-23w-team03-master\diabetic_retinopathy'
 preprocess.img_height = 256
 preprocess.img_width = 256
 prepare.buffer_size = 256
-prepare.batch_size = 16
-prepare.caching = True
-prepare_image_paths_and_labels.data_dir = 'D:\idrid\IDRID_dataset'
+prepare.batch_size = 32
+prepare.caching = False
+prepare_image_paths_and_labels.data_dir = r'D:\idrid\IDRID_dataset'

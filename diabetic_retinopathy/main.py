@@ -7,15 +7,15 @@ from evaluation.eval import evaluate, evaluate_regression
 from input_pipeline import datasets
 from utils import utils_params, utils_misc
 from models.architectures import vgg_like, simple_cnn, simple_cnn_regression
-from models.transferlearning import resnet50, densenet121
-import os
+from models.transferlearning import resnet50, densenet121, xception
 import wandb
 
-model_name = 'resnet50'
-folder = 'resnet50'
+model_name = 'simple_cnn'
+folder = 'simple_cnn'
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean("train", True, "Specify whether to train or evaluate a model.")
+flags.DEFINE_boolean("train", False, "Specify whether to train or evaluate a model.")
 flags.DEFINE_string("mode", "binary", "Specify the classification mode: binary or multiclass.")
+
 
 def main(argv):
     # generate folder structures
@@ -46,7 +46,7 @@ def main(argv):
         raise ValueError("Unsupported mode. Choose 'binary' or 'multiclass'.")
 
     # model
-    if model_name == 'vgg_Like':
+    if model_name == 'vgg_like':
         model = vgg_like(input_shape=(256, 256, 3), num_classes=num_classes)
     elif model_name == 'simple_cnn':
         model = simple_cnn(input_shape=(256, 256, 3), num_classes=num_classes)
@@ -54,10 +54,11 @@ def main(argv):
         model = resnet50(input_shape=(256, 256, 3), num_classes=num_classes)
     elif model_name == 'densenet121':
         model = densenet121(input_shape=(256, 256, 3), num_classes=num_classes)
+    elif model_name == 'xception':
+        model = xception(input_shape=(256, 256, 3), num_classes=num_classes)
     elif model_name == 'simple_cnn_regression':
         model = simple_cnn_regression(input_shape=(256, 256, 3))
     print("Model initialized.")
-
 
     if FLAGS.train:
         print("Starting training...")

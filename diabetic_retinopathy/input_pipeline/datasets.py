@@ -4,7 +4,6 @@ import tensorflow as tf
 import os
 from .preprocessing import preprocess, augment
 import matplotlib.pyplot as plt
-import tensorflow_datasets as tfds
 from .createTFRecord import prepare_image_paths_and_labels
 from .createTFRecord import create_tfrecord
 import numpy as np
@@ -103,7 +102,7 @@ def load(name, data_dir):
             plt.figure(figsize=(6, 6))
             plt.imshow(image.astype('uint8'))
             plt.title(f'Label: {label.numpy()}')
-            plt.axis('off')  #
+            plt.axis('off')
             plt.show()
             plt.savefig('btgraham300_example.png',transparent=True, bbox_inches='tight', pad_inches=0)
 

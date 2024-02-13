@@ -61,7 +61,7 @@ class ConfusionMatrix(tf.keras.metrics.Metric):
         plt.colorbar()
         plt.xlabel("True Labels")
         plt.ylabel("Predicted Labels")
-        plt.title("Binary Confusion matrix")
+        plt.title("Confusion matrix")
 
         thresh = cm.max() / 2
         for x in range(self.num_classes):
