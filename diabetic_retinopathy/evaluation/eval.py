@@ -51,6 +51,7 @@ def evaluate(model, ds_test, checkpoint_paths,num_classes, labels):
 
     return test_loss.result(), test_accuracy.result()
 
+
 def evaluate_regression(model, ds_test, checkpoint_paths):
     # Load Checkpoints
     checkpoint = tf.train.Checkpoint(step=tf.Variable(1), net=model)
@@ -60,7 +61,6 @@ def evaluate_regression(model, ds_test, checkpoint_paths):
         tf.print("Restored from {}".format(checkpoint_manager.latest_checkpoint))
     else:
         tf.print("Initializing from scratch.")
-    step = int(checkpoint.step.numpy())
 
     model.compile(optimizer=tf.keras.optimizers.Adam(),
                   loss=tf.keras.losses.Huber(),
@@ -73,7 +73,6 @@ def evaluate_regression(model, ds_test, checkpoint_paths):
     # Evaluation step
     @tf.function
     def test_step(images, labels):
-        predictions = model(images, training=False)
         predictions = model(images, training=False)
         t_loss = tf.keras.losses.Huber()(labels, predictions)
         test_loss(t_loss)

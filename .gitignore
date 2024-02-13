@@ -6,8 +6,7 @@ __pycache__/
 # PyCharm
 .idea/
 
-# Custom
-experiments/
+git
 
 # C extensions
 *.so

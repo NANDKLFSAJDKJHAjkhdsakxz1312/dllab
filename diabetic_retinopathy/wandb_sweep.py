@@ -1,15 +1,15 @@
 import logging
 import wandb
 import gin
-import math
+from train_regression import Trainer_regression
 from input_pipeline.datasets import load
 from models.architectures import vgg_like, simple_cnn
-from models.transferlearning import  resnet50, densenet201
+from models.transferlearning import  resnet50, densenet121
 from train import Trainer
 from utils import utils_params, utils_misc
 from input_pipeline.createTFRecord import create_tfrecord
 from input_pipeline.createTFRecord import prepare_image_paths_and_labels
-import os
+
 
 model_name = 'simple_cnn'
 def train_func():
@@ -21,7 +21,7 @@ def train_func():
             bindings.append(f"{key}={value}")
 
         # generate folder structures
-        run_paths = utils_params.gen_run_folder(",".join(bindings))
+        run_paths = utils_params.gen_run_folder(run.id)
 
         # gin-config
         gin.parse_config_files_and_bindings(["configs/config.gin"], bindings)
@@ -46,17 +46,17 @@ def train_func():
         print("TfRecord files created.")
 
         # setup pipeline
-        ds_train, ds_val, ds_test = load()
+        ds_train, ds_val, ds_test, ds_info = load()
 
         # model
         if model_name == 'VGG16':
-            model = vgg_like(input_shape=(256, 256, 3), n_classes=2)
+            model = vgg_like(input_shape=(256, 256, 3), num_classes=2)
         elif model_name == 'simple_cnn':
-            model = simple_cnn(input_shape=(256, 256, 3), n_classes=2)
+            model = simple_cnn(input_shape=(256, 256, 3), num_classes=2)
         elif model_name == 'resnet50':
-            model = resnet50(input_shape=(256, 256, 3), n_classes=2)
+            model = resnet50(input_shape=(256, 256, 3), num_classes=2)
         elif model_name == 'densenet201':
-            model = densenet201(input_shape=(256, 256, 3), n_classes=2)
+            model = densenet121(input_shape=(256, 256, 3), num_classes=2)
 
         # set loggers
         utils_misc.set_loggers(run_paths['path_logs_train'], logging.INFO)
@@ -69,7 +69,7 @@ def train_func():
 
 sweep_config = {
     "name": "idrid-sweep",
-    "method": "grid",
+    "method": "random",
     "metric": {"name": "val_acc", "goal": "maximize"},
     "parameters": {
         "preprocess.img_height": {"value": 256},
