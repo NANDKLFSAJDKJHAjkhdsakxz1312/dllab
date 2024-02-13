@@ -151,8 +151,8 @@ def plot_sensor_data_with_labels(data_file, label_file, title, output_dir):
 
 if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.realpath(__file__))
-    data_dir = 'D:/HAPT/RawData'
-    labels_file = 'D:/HAPT/RawData/labels.txt'
+    data_dir = '/misc/home/data/HAPT_dataset/RawData'
+    labels_file = '/misc/home/data/HAPT_dataset/RawData/labels.txt'
     output_dir = os.path.join(current_dir)
     num_experiments = 61
     num_users = 30
