@@ -2,20 +2,11 @@ import os
 import datetime
 
 def gen_run_folder(path_model_id=""):
-    """Generates a folder structure for a model run with unique identifiers and paths for logging and checkpoints.
-
-    Args:
-        path_model_id (str): Optional. An identifier for the model run. If not provided, a timestamp is used.
-
-    Returns:
-        dict: A dictionary containing paths for the model ID, training logs, evaluation logs, training checkpoints, evaluation checkpoints, gin configuration, training summary, and profiler summary.
-    """
     run_paths = dict()
     path_model_root = os.path.abspath(
         os.path.join(os.path.dirname(__file__), os.pardir, "experiments")
     )
-
-    # Function to find if the directory exists; if not, creates a new one
+    # find if there is already a file, if not then crate a new one
     def find_file(file_dir, path_model_id):
         target_dir_path = os.path.join(file_dir, path_model_id)
         if os.path.isdir(target_dir_path):
@@ -30,53 +21,51 @@ def gen_run_folder(path_model_id=""):
         run_id = "run_" + date_creation
         if path_model_id:
             run_id += "_" + path_model_id
-        path_model_id = run_id  # Fixed logic error in original code
+        run_id = path_model_id
         run_paths["path_model_id"] = os.path.join(path_model_root, run_id)
     else:
         run_paths["path_model_id"] = path_model_id
 
-    # Define paths for logs, checkpoints, gin configuration, and summaries
-    paths_keys = ["path_logs_train", "path_logs_eval", "path_ckpts_train", "path_ckpts_eval", "path_gin",
-                  "path_summary_train", "path_summary_profiler"]
-    paths_values = ["logs/run.log", "logs/eval/run.log", 'ckpts', "ckpts/eval", "config_operative.gin",
-                    'summary/train', 'summary']
-    run_paths.update({k: os.path.join(run_paths["path_model_id"], v) for k, v in zip(paths_keys, paths_values)})
+    run_paths["path_logs_train"] = os.path.join(run_paths["path_model_id"], "logs", "run.log")
+    run_paths["path_logs_eval"] = os.path.join(run_paths["path_model_id"], "logs", "eval", "run.log")
+    run_paths["path_ckpts_train"] = os.path.join(run_paths["path_model_id"], 'ckpts')
+    run_paths["path_ckpts_eval"] = os.path.join(run_paths["path_model_id"], "ckpts", "eval")
+    run_paths["path_gin"] = os.path.join(run_paths["path_model_id"], "config_operative.gin")
+    run_paths['path_summary_train'] = os.path.join(run_paths["path_model_id"], 'summary', 'train')
+    run_paths['path_summary_profiler'] = os.path.join(run_paths['path_model_id'], 'summary')
 
-    # Create necessary directories
-    for key, path in run_paths.items():
-        if "path" in key and "logs" not in key:
-            os.makedirs(os.path.dirname(path), exist_ok=True)
+    # Create folders
+    for k, v in run_paths.items():
+        if any([x in k for x in ["path_model", "path_ckpts", "path_summary"]]):
+            if not os.path.exists(v):
+                os.makedirs(v, exist_ok=True)
 
-    # Ensure log files exist
-    for log_key in [k for k in run_paths if "logs" in k]:
-        os.makedirs(os.path.dirname(run_paths[log_key]), exist_ok=True)
-        open(run_paths[log_key], "a").close()  # Touch file
+    # Create files
+    for k, v in run_paths.items():
+        if any([x in k for x in ["path_logs"]]):
+            if not os.path.exists(v):
+                os.makedirs(os.path.dirname(v), exist_ok=True)
+                with open(v, "a"):
+                    pass  # atm file creation is sufficient
 
     return run_paths
 
-def save_config(path_gin, config):
-    """Saves the gin configuration to a file.
 
-    Args:
-        path_gin (str): Path to the gin configuration file.
-        config (str): The gin configuration to be saved.
-    """
+def save_config(path_gin, config):
     with open(path_gin, 'w') as f_config:
         f_config.write(config)
 
 def gin_config_to_readable_dictionary(gin_config: dict):
-    """Converts gin configuration to a more readable dictionary format, useful for logging.
-
-    Args:
-        gin_config (dict): The gin configuration dictionary.
-
-    Returns:
-        dict: A cleaned and parsed dictionary of the gin configuration.
+    """
+    Parses the gin configuration to a dictionary. Useful for logging to e.g. W&B
+    :param gin_config: the gin's config dictionary. Can be obtained by gin.config._OPERATIVE_CONFIG
+    :return: the parsed (mainly: cleaned) dictionary
     """
     data = {}
-    for key, values in gin_config.items():
-        name = key[1].split(".")[1]  # Extract name from the tuple key
+    for key in gin_config.keys():
+        name = key[1].split(".")[1]
+        values = gin_config[key]
         for k, v in values.items():
-            data[f"{name}/{k}"] = v
+            data["/".join([name, k])] = v
 
     return data
