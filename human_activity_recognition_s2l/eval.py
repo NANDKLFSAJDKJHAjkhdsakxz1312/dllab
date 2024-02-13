@@ -35,7 +35,7 @@ def evaluate(model, checkpoint_dir, ds_test):
     # Checkpoint path - Find the latest checkpoint file
     latest_ckpt = tf.train.latest_checkpoint(checkpoint_dir)
     if latest_ckpt:
-        ckpt = tf.train.Checkpoint(step=tf.Variable(1), optimizer=tf.keras.optimizers.Adam(), net=model)
+        ckpt = tf.train.Checkpoint(step=tf.Variable(1), optimizer=tf.keras.optimizers.legacy.Optimizer.Adam(), net=model)
         ckpt.restore(latest_ckpt)
         print(f"Restored from {latest_ckpt}")
     else:
