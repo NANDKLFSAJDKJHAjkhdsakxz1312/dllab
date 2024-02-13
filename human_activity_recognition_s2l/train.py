@@ -18,7 +18,8 @@ class Trainer(object):
         ckpt_interval,
     ):
         self.model = model
-        self.optimizer = tf.keras.optimizers.legacy.Optimizer.Adam()
+        self.optimizer = tf.keras.optimizers.legacy.Adam()
+
         self.ds_train = ds_train
         self.ds_val = ds_val
         self.total_steps = total_steps
