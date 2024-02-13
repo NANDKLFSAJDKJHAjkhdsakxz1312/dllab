@@ -10,7 +10,7 @@ densenet121.trainable_rate = 1e-05
 # ==============================================================================
 load.data_dir = \
     'C:\\Users\\JIANGNAN\\Desktop\\dl-lab-23w-team03-master\\dl-lab-23w-team03-master\\diabetic_retinopathy'
-load.name = 'idrid'
+load.name = 'eyepacs'
 
 # Parameters for prepare:
 # ==============================================================================

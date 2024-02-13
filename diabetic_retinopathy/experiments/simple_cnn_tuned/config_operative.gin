@@ -16,7 +16,7 @@ load.name = 'idrid'
 # ==============================================================================
 prepare.batch_size = 32
 prepare.buffer_size = 256
-prepare.caching = False
+prepare.caching = True
 
 # Parameters for prepare_image_paths_and_labels:
 # ==============================================================================
@@ -33,10 +33,10 @@ resnet50.trainable_rate = 1e-05
 
 # Parameters for simple_cnn:
 # ==============================================================================
-simple_cnn.base_filters = 8
-simple_cnn.dense_units = 32
-simple_cnn.dropout_rate = 0.2
-simple_cnn.n_blocks = 3
+simple_cnn.base_filters = 32
+simple_cnn.dense_units = 64
+simple_cnn.dropout_rate = 0.1
+simple_cnn.n_blocks = 2
 
 # Parameters for simple_cnn_regression:
 # ==============================================================================
