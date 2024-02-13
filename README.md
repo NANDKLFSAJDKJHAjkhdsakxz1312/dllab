@@ -306,3 +306,7 @@ Go to visualization.py and run it. You will get the visualization for a sequence
 
 ### optimization
 Go to optimization.py and run it to do tuning.
+
+### Result
+for CRNN model we have a nice balanced accuracy of 84.46% and following confusion matrix: 
+![crnn_cm](https://media.github.tik.uni-stuttgart.de/user/7295/files/ce639535-b49c-4f42-8d84-04fd40bb5cb9)
