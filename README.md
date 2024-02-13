@@ -288,9 +288,7 @@ load.name='HAPT'
 ```
 
 #### 3. Set Project Folder Location
-In the configuration file, you need to specify the location of your project files. For example, if your project is located at 
-'D:\HAR\pythonProject\input_pipeline_s2l' , you should set it as follows:
-    
+In the configuration file, you need to specify the location of tfrecord files, which are goting to be generated after you run main.py. For example, if your project is located at 'D:\HAR\pythonProject' , you should set it as follows:
   
     load.data_dir=r'D:\HAR\pythonProject\input_pipeline_s2l'
     
