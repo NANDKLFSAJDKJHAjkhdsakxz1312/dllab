@@ -155,3 +155,24 @@ In this task, we use 2 kinds of labeling ways: S2S and S2L. Yixuan is responsibl
 ## S2S
 
 ## S2L
+In sequence to label method, we create a label for each window, then we start to train and evaluate our model. 
+
+### Configuration Setup
+
+Before you start, you need to configure the paths for your project files and dataset to ensure the code can access the required files correctly.
+
+#### 1. Open Configuration File
+First, navigate to the `configs/config.gin` file.
+
+#### 2. Set Dataset Name
+For this project, we specifically use the IDRID dataset for the binary classification task. So please check
+```gin
+load.name='HAPT'
+```
+
+#### 3. Set Project Folder Location
+In the configuration file, you need to specify the location of your project files. For example, if your project is located at 
+`/misc/home/RUS_CIP/st178402/dl-lab-23w-team03/diabetic_retinopathy`, you should set it as follows:
+    
+  
+    load.data_dir='/misc/home/RUS_CIP/st181029/dl-lab-23w-team03/diabetic_retinopathy'
