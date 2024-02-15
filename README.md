@@ -173,6 +173,7 @@ Go to `input_pipeline/preprocessing_visualization.py` and find `data_dir` and `l
     data_dir = '/misc/home/data/HAPT_dataset/RawData'
     labels_file = '/misc/home/data/HAPT_dataset/RawData/labels.txt'
 ```
+Run it to get combined dataset.
 
 ### Training the Model
 
