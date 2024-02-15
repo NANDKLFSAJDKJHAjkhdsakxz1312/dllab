@@ -168,12 +168,12 @@ load.name='HAPT'
 ```
 
 ### Set Dataset Path
-Go to `input_pipeline/preprocessing_visualization.py` and find `data_dir` and `labels_file` the path is according to the location of HAPT dataset.
+Go to `input_pipeline/preprocessing_and_visualization.py` and find `data_dir` and `labels_file` the path is according to the location of HAPT dataset.
 ``` 
     data_dir = '/misc/home/data/HAPT_dataset/RawData'
     labels_file = '/misc/home/data/HAPT_dataset/RawData/labels.txt'
 ```
-Run it to get combined dataset.
+Run it to get combined datasets.
 
 ### Training the Model
 
